@@ -5,6 +5,7 @@ const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
 const Router = require('express').Router;
 const bearerAuth = require('../lib/bearer-auth.js');
+const Org = require('../model/org.js'); 
 
 const orgRouter = module.exports = Router();
 
