@@ -15,20 +15,20 @@ projectRouter.post('/api/org/:orgId/project', bearerAuth, jsonParser, function(r
   //TODO: route logic
 });
 
-projectRouter.get('/api/org/:orgId/project/:projectId', bearerAuth, function(req, res, next) {
-  debug('GET: /api/org/orgId/project/projectId');
+projectRouter.get('/api/project/:projectId', bearerAuth, function(req, res, next) {
+  debug('GET: /api/project/projectId');
 
   //TODO: route logic
 });
 
-projectRouter.put('/api/org/:orgId/project/:projectId', bearerAuth, jsonParser, function(req, res, next) {
-  debug('PUT: /api/org/orgId/project/projectId');
+projectRouter.put('/api/project/:projectId', bearerAuth, jsonParser, function(req, res, next) {
+  debug('PUT: /api/project/projectId');
 
   //TODO: route logic
 });
 
-projectRouter.delete('/api/org/:orgId/project/:projectId', bearerAuth, function( req, res, next) {
-  debug('DELETE: /api/org/orgId/project/projectId');
+projectRouter.delete('/api/project/:projectId', bearerAuth, function( req, res, next) {
+  debug('DELETE: /api/project/projectId');
 
   //TODO: route logic
 });

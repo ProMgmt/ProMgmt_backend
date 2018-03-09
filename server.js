@@ -4,14 +4,18 @@ const express = require('express');
 const debug = require('debug')('promgmt:server');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const dotenv =  require('dotenv');
 const cors = require('cors');
 
 const userRouter = require('./routes/user-router.js');
 const errors = require('./lib/err-middleware.js');
 
+dotenv.load();
+
 const app = express();
+//const MONGODB_URI = 'mongodb://localhost/promgmt';
 const PORT = process.env.PORT || 3000;
-//mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI);
 
 app.use(cors());
 app.use(morgan('dev'));
