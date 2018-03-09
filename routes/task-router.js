@@ -9,26 +9,26 @@ const Task = require('../model/task.js');
 
 const taskRouter = module.exports = Router();
 
-taskRouter.post('/api/org/:orgId/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
-  debug('POST: /api/org/orgId/project/projectId/task');
+taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
+  debug('POST: /api/project/projectId/task');
 
   //TODO: route logic
 });
 
-taskRouter.get('/api/org/:orgId/project/:projectId/task/:taskId', bearerAuth, function(req, res, next) {
-  debug('/api/org/orgId/project/projectId/task/taskId');
+taskRouter.get('/api/task/:taskId', bearerAuth, function(req, res, next) {
+  debug('/api/task/taskId');
 
   //TODO: route logic
 });
 
-taskRouter.put('/api/org/:orgId/project/:projectId/task/:taskId', bearerAuth, jsonParser, function(req, res, next) {
-  debug('/api/org/orgId/project/projectId/task/taskId');
+taskRouter.put('/api/task/:taskId', bearerAuth, jsonParser, function(req, res, next) {
+  debug('/api/task/taskId');
 
   //TODO: route logic
 });
 
-taskRouter.delete('/api/org/:org/project/:projectId/task/:taskId', bearerAuth, function(req, res, next) {
-  debug('api/org/orgId/project/projectId/task/taskId');
+taskRouter.delete('/api/task/:taskId', bearerAuth, function(req, res, next) {
+  debug('api/task/taskId');
 
   //TODO: route logic
 });

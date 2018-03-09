@@ -9,7 +9,7 @@ const Task = require('./task.js');
 const projectSchema = Schema({
   orgId: {type: Schema.Types.ObjectId, required: true},
   users: [{type: Schema.Types.ObjectId, ref: 'user'}],
-  adminId: {type: Schema.Types.ObjectId, required: true},
+  admins: [{type: Schema.Types.ObjectId, ref: 'user', required: true}],
   tasks: [{type: Schema.Types.ObjectId, ref: 'task'}],
   projectName: {type: String, required: true},
   desc: {type: String},

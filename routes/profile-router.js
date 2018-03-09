@@ -9,8 +9,8 @@ const Profile = require('../model/profile.js');
 
 const profileRouter = module.exports = Router();
 
-profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
-  debug('POST: /api/profile');
+profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function(req, res, next) {
+  debug('POST: /api/user/userId/profile');
 
   //TODO: route logic
 });
