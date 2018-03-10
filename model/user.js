@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema({
   findHash: {type: String, unique: true},
 });
 
-module.exports = mongoose.model('user', userSchema);
+
 
 userSchema.methods.generatePasswordHash = function(password){
   debug('generatePasswordHash');
@@ -76,3 +76,5 @@ userSchema.methods.generateToken = function(){
       .catch(err => reject(err));
   });
 };
+
+module.exports = mongoose.model('user', userSchema);

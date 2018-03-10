@@ -12,13 +12,15 @@ const orgRouter = module.exports = Router();
 orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/org');
 
-  //TODO: route logic
+  new Org(req.body).save()
+    .then( org => res.json(org))
+    .catch(next);
 });
 
 orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('GET: /api/org/orgId');
 
-  //TODO: route logic
+  
 });
 
 orgRouter.put('/api/org/:orgId', bearerAuth, jsonParser, function(req, res, next) {
