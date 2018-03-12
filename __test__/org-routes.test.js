@@ -47,7 +47,7 @@ describe('Org Routes', function() {
     });
 
     describe('with invalid usage', () => {
-      it('should respond with a 404 for an ID that is not found', () => {
+      it('should respond with a 404 for an ID that is not found', done => {
         // TODO: add test
         done();
       });
