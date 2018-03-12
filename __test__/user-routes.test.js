@@ -25,22 +25,21 @@ describe('User Routes', function() {
     serverToggle.serverOff(server, done);
   });
 
-  afterEach( done => {
-    User.remove({})
-      .then( () => done() )
-      .catch(done);
-  });
-  
+
   describe('POST /api/signup', () => {
+    afterAll( done => {
+      User.remove({})
+        .then( () => done() )
+        .catch(done);
+    });
+
     describe('with VALID usage', () => {
       it('should add a user to the database', done => {
         superagent.post(`${url}/api/signup`)
           .send(exampleUser)
           .end((err, res) => {
             expect(res.status).toEqual(200);
-            expect(res.body.username).toEqual(exampleUser.username);
-            expect(res.body.password).toEqual(exampleUser.password);
-            expect(res.body.email).toEqual(exampleUser.email);
+            expect(typeof res.text).toEqual('string');
             done();
           });
       });
@@ -48,8 +47,8 @@ describe('User Routes', function() {
 
     describe('with INVALID usage', () => {
       it('should respond with a 400 when the request body is incomplete', done => {
-        superagent.post('/api/signup')
-          .send({ username: exampleUser.username })
+        superagent.post(`${url}/api/signup`)
+          .send({ username: 'something' })
           .end((err, res) => {
             expect(res.status).toEqual(400);
             expect(res.text).toEqual('BadRequestError');
@@ -58,7 +57,13 @@ describe('User Routes', function() {
       });
 
       it('should respond with a 400 if the username is already taken', done => {
-        // TODO: add this test and functionality in the routes
+        superagent.post(`${url}/api/signup`)
+          .send(exampleUser)
+          .end((err, res) => {
+            expect(res.status).toEqual(409);
+            expect(res.text).toEqual('ConflictError');
+            done();
+          });
       });
     });
   });
@@ -66,12 +71,23 @@ describe('User Routes', function() {
 
   describe('GET /api/signin', () => {
     beforeEach( done => {
-      new User(exampleUser).generatePasswordHash(exampleUser.password)
+      new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
         .then( user => user.save() )
         .then( user => {
           this.tempUser = user;
+          return user.generateToken();
+        })
+        .then( token => {
+          this.tempToken = token;
           done();
         })
+        .catch(done);
+    });
+
+    afterEach( done => {
+      User.remove({})
+        .then( () => done())
         .catch(done);
     });
 
@@ -83,20 +99,28 @@ describe('User Routes', function() {
             if (err) return done(err);
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
-            // ??? this test the routes, not the actual user creation. might have to rework this.
             done();
           });
       });     
     });
 
     describe('with INVALID usage', () => {
-      it('should return a 404 if the username and password do not exist', done => {
+      it('should return a 404 if the username does not exist', done => {
         superagent.get(`${url}/api/signin`)
-          .auth('someRandomUsername', `${exampleUser.pasword}`)
-          // ??? not sure if this is what auth is for
+          .auth('someRandomUsername', `${exampleUser.password}`)
           .end((err, res) => {
             expect(res.status).toEqual(404);
             expect(res.text).toEqual('NotFoundError');
+            done();
+          });
+      });
+
+      it('should return a 401 if the password is incorrect', done => {
+        superagent.get(`${url}/api/signin`)
+          .auth(`${exampleUser.username}`, `9871`)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            expect(res.text).toEqual('UnauthorizedError');
             done();
           });
       });
@@ -104,8 +128,27 @@ describe('User Routes', function() {
   });
 
   describe('DELETE /api/signin', () => {
+    beforeEach( done => {
+      new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save() )
+        .then( user => {
+          this.tempUser = user;
+          console.log('userId', this.tempUser._id);
+          return user.generateToken();
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+
     it('should return a 204 when the user has been deleted', done => {
-      superagent.delete(`${url}/api/signin/${this.tempUser._id}`)
+      superagent.delete(`${url}/api/user/${this.tempUser._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
         .end((err, res) => {
           if (err) return done (err);
           expect(res.status).toEqual(204);

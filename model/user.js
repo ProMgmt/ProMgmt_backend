@@ -15,8 +15,6 @@ const userSchema = mongoose.Schema({
   findHash: {type: String, unique: true},
 });
 
-
-
 userSchema.methods.generatePasswordHash = function(password){
   debug('generatePasswordHash');
 
