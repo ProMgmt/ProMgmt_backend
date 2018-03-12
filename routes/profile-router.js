@@ -32,7 +32,16 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
 profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile/profileId');
 
-  //TODO: route logic
+  if(!req.body.profileId) {
+    res.status(404).send();
+  }
+
+  Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
+    .then( profile => res.json(profile))
+    .catch( err => {
+      if(err.name === 'ValidationError') return next(err);
+      next(createError(404, err.message));
+    });
 });
 
 profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, next) {
