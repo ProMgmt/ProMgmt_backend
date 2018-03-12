@@ -8,18 +8,19 @@ const dotenv =  require('dotenv');
 const cors = require('cors');
 
 const userRouter = require('./routes/user-router.js');
+const orgRouter = require('./routes/org-router.js');
 const errors = require('./lib/err-middleware.js');
 
 dotenv.load();
 
 const app = express();
-//const MONGODB_URI = 'mongodb://localhost/promgmt';
 const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGODB_URI);
 
 app.use(cors());
 app.use(morgan('dev'));
 app.use(userRouter);
+app.use(orgRouter);
 app.use(errors);
 
 const server = module.exports = app.listen(PORT, () => {
@@ -27,6 +28,7 @@ const server = module.exports = app.listen(PORT, () => {
 });
 
 server.isRunning = true;
+
 
 
 
