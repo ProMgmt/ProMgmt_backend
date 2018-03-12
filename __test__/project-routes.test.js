@@ -222,7 +222,7 @@ describe('Project Routes', function() {
           });
       });
 
-      it.only('should respond with a 400 if no ID is provided', done => {
+      it('should respond with a 400 if no ID is provided', done => {
         superagent.put(`${url}/api/project/`)
           .set({
             Authorization: `Bearer ${this.tempToken}`,
@@ -236,8 +236,13 @@ describe('Project Routes', function() {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        // TODO: add test
-        done();
+        superagent.put(`${url}/api/project/${this.tempProject._id}`)
+          .send({ projectName: 'no TOKEN provided test' })
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            expect(res.text).toEqual('UnauthorizedError');
+            done();
+          });
       });  
     });
   });
@@ -245,8 +250,14 @@ describe('Project Routes', function() {
   describe('DELETE /api/project/:projectId', () => {
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        // TODO: add test
-        done();
+        superagent.delete(`${url}/api/project/${this.tempProject._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(204);
+            done();
+          });
       });
     });
   });

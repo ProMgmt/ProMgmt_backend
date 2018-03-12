@@ -58,7 +58,7 @@ projectRouter.delete('/api/project/:projectId', bearerAuth, function( req, res, 
   debug('DELETE: /api/project/projectId');
 
   Project.findByIdAndRemove(req.params.projectId)
-    .then(() => res.sendStatus(204))
+    .then(() => res.sendStatus(204, 'project deleted'))
     .catch(next);
 });
 
