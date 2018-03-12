@@ -11,6 +11,12 @@ require('jest');
 
 const url = `http://localhost:${PORT}`;
 
+const exampleProfie = {
+  firstName: 'example first name', 
+  lastName: 'example last name', 
+  desc: 'example description',
+}
+
 describe('Profile Routes', function() {
   beforeAll( done => {
     serverToggle.serverOn(server, done);
@@ -21,9 +27,11 @@ describe('Profile Routes', function() {
   });
 
   describe('POST /api/user/:userId/profile', () => {
+
+
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        // TODO: add test
+        
         done();
       });
     });
