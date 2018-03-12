@@ -12,6 +12,11 @@ const orgRouter = module.exports = Router();
 orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/org');
 
+  if(!req.body.name || !req.body.desc) {
+    return next(createError(400,'Bad REquest'));
+  }
+
+  req.body.admins = req.user._id;
   new Org(req.body).save()
     .then( org => res.json(org))
     .catch(next);
@@ -20,7 +25,9 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
 orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('GET: /api/org/orgId');
 
-  
+  Org.findById(req.params.orgId)
+    .then( org => res.json(org))
+    .catch(next);
 });
 
 orgRouter.put('/api/org/:orgId', bearerAuth, jsonParser, function(req, res, next) {
@@ -32,7 +39,9 @@ orgRouter.put('/api/org/:orgId', bearerAuth, jsonParser, function(req, res, next
 orgRouter.delete('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/org/orgId');
 
-  //TODO: logic
+  Org.findByIdAndRemove(req.params.orgId)
+    .then( () => res.sendStatus(204))
+    .catch(next);
 });
 
 
