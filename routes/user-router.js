@@ -13,7 +13,7 @@ const userRouter = module.exports = Router();
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
 
-  if(!req.body.username || !req.body.email) {
+  if(!req.body.username && !req.body.email) {
     return next(createError(400, 'Bad Request'));
   }
 
