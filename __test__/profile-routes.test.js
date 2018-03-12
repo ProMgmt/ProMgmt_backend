@@ -144,7 +144,6 @@ describe('Profile Routes', function() {
       new Profile(exampleProfile).save()
         .then( profile => {
           this.tempProfile = profile;
-          console.log('temp profile', this.tempProfile);
           done();
         })
         .catch(done)
@@ -163,7 +162,7 @@ describe('Profile Routes', function() {
       });
 
     describe('with VALID usage', () => {
-      it.only('should return a 200 status code for valid requests', done => {
+      it('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
 
         .set({
@@ -178,9 +177,15 @@ describe('Profile Routes', function() {
     });
 
     describe('with invalid usage', () => {
-      it('should respond with a 404 for an ID that is not found', () => {
-        // TODO: add test
-        done();
+      it.only('should respond with a 404 for an ID that is not found', done => {
+        superagent.get(`${url}/api/profile/123`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(404);
+          done();
+        });
       });
 
       it('should respond with a 400 if no ID is provided', done => {
