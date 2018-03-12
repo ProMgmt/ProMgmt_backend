@@ -5,6 +5,7 @@ const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
 const Router = require('express').Router;
 const bearerAuth = require('../lib/bearer-auth.js');
+const Project = require('../model/profile.js');
 const Task = require('../model/task.js');
 
 const taskRouter = module.exports = Router();
@@ -12,7 +13,7 @@ const taskRouter = module.exports = Router();
 taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/project/projectId/task');
 
-  //TODO: route logic
+  
 });
 
 taskRouter.get('/api/task/:taskId', bearerAuth, function(req, res, next) {
