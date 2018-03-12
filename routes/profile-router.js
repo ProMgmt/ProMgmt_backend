@@ -47,5 +47,11 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
 profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile/profileId');
 
-  //TODO: route logic
+  if(!req.body.profileId) {
+    res.status(404).send();
+  }
+
+  Profile.findByIdAndRemove(req.params.profileId)
+    .then( () => res.status(204).send())
+    .catch( err => next(createError(404, err.message)));
 });
