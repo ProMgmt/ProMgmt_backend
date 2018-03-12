@@ -40,5 +40,8 @@
     "eslint": "^4.18.2",
     "jest": "^22.4.2",
     "superagent": "^3.8.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
