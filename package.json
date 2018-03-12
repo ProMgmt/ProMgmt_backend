@@ -7,8 +7,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "DEBUG='promgmt*' jest -i",
+    "start": "DEBUG='promgmt*' node server.js"
   },
   "repository": {
     "type": "git",
@@ -40,5 +40,8 @@
     "eslint": "^4.18.2",
     "jest": "^22.4.2",
     "superagent": "^3.8.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
