@@ -14,7 +14,7 @@ const url = `http://localhost:${PORT}`;
 const exampleUser = {
   username: 'example username',
   password: 'example password',
-  email: 'example email'
+  email: 'exampleemail@test.com',
 }
 
 const exampleProfile = {
@@ -29,27 +29,51 @@ describe('Profile Routes', function() {
   });
 
   afterAll( done => {
-    serverToggle.serverOn(server, done);
+    serverToggle.serverOff(server, done);
   });
 
-  describe('POST /api/user/:userId/profile', () => {
+  describe('POST: /api/user/:userId/profile', () => {
    
+    beforeEach( done => {
+      let user = new User(exampleUser)
+      user.generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken()
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+    
     afterEach( done => {
-      Profile.remove(exampleProfile) //how should i remove without emptying pool?
+      User.remove({})
+        .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+        .catch(done);
+    });
+
+    afterEach( done => {
+      Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
         .then( () => done())
         .catch(done);
     });
 
     describe('with VALID usage', () => {
       it.only('should return a 200 status code for valid requests', done => {
-        superagent.post(`${url}/api.user/:userId/profile`)
+        superagent(`${url}/api/user/${this.tempUser._id}/profile`)
         .send(exampleProfile)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
         .end((err, res) => {
           if(err) return done(err);
           expect(res.status).toEqual(200);
           // expect(typeof res.text).toEqual('string');
+          done();
         })
-        done();
       });
     });
 
