@@ -32,6 +32,9 @@ describe('Profile Routes', function() {
     serverToggle.serverOff(server, done);
   });
 
+
+  //POST ROUTE TESTS
+
   describe('POST: /api/user/:userId/profile', () => {
    
     beforeEach( done => {
@@ -62,8 +65,8 @@ describe('Profile Routes', function() {
     });
 
     describe('with VALID usage', () => {
-      it.only('should return a 200 status code for valid requests', done => {
-        superagent(`${url}/api/user/${this.tempUser._id}/profile`)
+      it('should return a 200 status code for valid requests', done => {
+        superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
         .send(exampleProfile)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -71,19 +74,27 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if(err) return done(err);
           expect(res.status).toEqual(200);
-          // expect(typeof res.text).toEqual('string');
           done();
-        })
+        });
       });
     });
 
     describe('with INVALID usage', () => {
-      it('should respond with a 400 if the request body is invalid', done => {
-        // TODO: add test
-        done();
+      it.only('should respond with a 400 if the request body is invalid', done => {
+        superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(400);
+          done();
+        });
       });
     });
   });
+
+
+  // GET ROUTE TESTS
 
   describe('GET /api/profile/:profileId', () => {
     describe('with VALID usage', () => {
@@ -111,6 +122,9 @@ describe('Profile Routes', function() {
     });
   });
 
+
+  // PUT ROUTE TESTS
+
   describe('PUT /api/profile/:profileId', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
@@ -136,6 +150,9 @@ describe('Profile Routes', function() {
       });  
     });
   });
+
+
+  // DELETE ROUTE TESTS
 
   describe('DELETE /api/profile/:profileId', () => {
     describe('with VALID usage', () => {
