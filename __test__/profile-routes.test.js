@@ -80,13 +80,22 @@ describe('Profile Routes', function() {
     });
 
     describe('with INVALID usage', () => {
-      it.only('should respond with a 400 if the request body is invalid', done => {
+      it('should respond with a 400 if the request body is invalid', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
         .end((err, res) => {
           expect(res.status).toEqual(400);
+          done();
+        });
+      });
+
+      it.only('should return a 401 unauthorized', done => {
+        superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
+        .send(exampleUser)
+        .end((err, res) => {
+          expect(res.status).toEqual(401);
           done();
         });
       });
