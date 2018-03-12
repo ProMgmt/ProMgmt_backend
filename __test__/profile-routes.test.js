@@ -74,6 +74,9 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if(err) return done(err);
           expect(res.status).toEqual(200);
+          expect(res.body.desc).toEqual(exampleProfile.desc);
+          expect(res.body.firstName).toEqual(exampleProfile.firstName);
+          expect(res.body.lastName).toEqual(exampleProfile.lastName);
           done();
         });
       });
@@ -91,11 +94,26 @@ describe('Profile Routes', function() {
         });
       });
 
-      it.only('should return a 401 unauthorized', done => {
+      it('should return a 401 unauthorized', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
-        .send(exampleUser)
+        .send(exampleProfile)
         .end((err, res) => {
           expect(res.status).toEqual(401);
+          done();
+        });
+      });
+
+
+      //test not passing
+      it('should return a 404 for invalid user id provided', done => {
+        superagent.post(`${url}/api/user/123/profile`)
+        .send(exampleProfile)
+        .set({ 
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          console.log(this.tempUser);
+          expect(res.status).toEqual(404);
           done();
         });
       });
@@ -106,10 +124,56 @@ describe('Profile Routes', function() {
   // GET ROUTE TESTS
 
   describe('GET /api/profile/:profileId', () => {
+    beforeEach( done => {
+      let user = new User(exampleUser)
+      user.generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken()
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+
+    beforeEach( done => {
+      exampleProfile.userId = this.tempUser._id;
+      new Profile(exampleProfile).save()
+        .then( profile => {
+          this.tempProfile = profile;
+          console.log('temp profile', this.tempProfile);
+          done();
+        })
+        .catch(done)
+      });
+
+      afterEach( done => {
+        User.remove({})
+          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+          .catch(done);
+      });
+  
+      afterEach( done => {
+        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+          .then( () => done())
+          .catch(done);
+      });
+
     describe('with VALID usage', () => {
-      it('should return a 200 status code for valid requests', done => {
-        // TODO: add test
-        done();
+      it.only('should return a 200 status code for valid requests', done => {
+        superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
+
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).toEqual(200);
+          done();
+        })
       });
     });
 

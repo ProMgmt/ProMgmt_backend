@@ -9,6 +9,8 @@ const Profile = require('../model/profile.js');
 
 const profileRouter = module.exports = Router();
 
+//POST ROUTE
+
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/user/userId/profile');
 
@@ -18,18 +20,26 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
     return next(createError(400, 'user id not found'))
   }
 
+  // if (!req.checkBody('userId').exists()) {
+  //   return next(createError(404, 'user id not found'))
+  // }
+
   new Profile(req.body).save()
     .then( profile => res.json(profile))
     .catch(next);
 });
 
+//GET ROUTE
+
 profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next) {
-  debug('GET: /api/profile');
+  debug('GET: /api/profile/profileId');
 
   Profile.findById(req.params.profileId)
     .then( profile => res.json(profile))
     .catch(next);
 });
+
+//PUT ROUTE
 
 profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile/profileId');
@@ -48,6 +58,8 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
       });
   }
 });
+
+//DELETE ROUTE
 
 profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile/profileId');
