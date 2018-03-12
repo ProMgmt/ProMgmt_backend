@@ -11,7 +11,13 @@ require('jest');
 
 const url = `http://localhost:${PORT}`;
 
-const exampleProfie = {
+const exampleUser = {
+  username: 'example username',
+  password: 'example password',
+  email: 'example email'
+}
+
+const exampleProfile = {
   firstName: 'example first name', 
   lastName: 'example last name', 
   desc: 'example description',
@@ -27,11 +33,22 @@ describe('Profile Routes', function() {
   });
 
   describe('POST /api/user/:userId/profile', () => {
-
+   
+    afterEach( done => {
+      Profile.remove(exampleProfile) //how should i remove without emptying pool?
+        .then( () => done())
+        .catch(done);
+    });
 
     describe('with VALID usage', () => {
-      it('should return a 200 status code for valid requests', done => {
-        
+      it.only('should return a 200 status code for valid requests', done => {
+        superagent.post(`${url}/api.user/:userId/profile`)
+        .send(exampleProfile)
+        .end((err, res) => {
+          if(err) return done(err);
+          expect(res.status).toEqual(200);
+          // expect(typeof res.text).toEqual('string');
+        })
         done();
       });
     });

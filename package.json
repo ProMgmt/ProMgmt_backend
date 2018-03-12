@@ -7,7 +7,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "DEBUG='promgmt*' jest -i",
+    "test": "DEBUG='promgmt*' jest -i profile-routes.test.js",
     "start": "DEBUG='promgmt*' node server.js"
   },
   "repository": {
