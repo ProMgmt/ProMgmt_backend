@@ -13,10 +13,7 @@ const userRouter = module.exports = Router();
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
 
-  if(req.body.username === undefined || req.body.email === undefined || req.body.password === undefined) {
-    console.log('invalid body', req.body);
-    return next(createError(400, 'Bad Request'));
-  }
+  if(req.body.username === undefined || req.body.email === undefined || req.body.password === undefined) return next(createError(400, 'Bad Request'));
 
   let password = req.body.password;
   delete req.body.password;

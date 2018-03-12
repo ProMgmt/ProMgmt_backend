@@ -9,6 +9,7 @@ const cors = require('cors');
 
 const userRouter = require('./routes/user-router.js');
 const orgRouter = require('./routes/org-router.js');
+const projectRouter = require('./routes/project-router.js');
 const errors = require('./lib/err-middleware.js');
 
 dotenv.load();
@@ -21,6 +22,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(userRouter);
 app.use(orgRouter);
+app.use(projectRouter);
 app.use(errors);
 
 const server = module.exports = app.listen(PORT, () => {
