@@ -13,7 +13,7 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/org');
 
   if(!req.body.name || !req.body.desc) {
-    return next(createError(400,'Bad REquest'));
+    return next(createError(400,'Bad Request'));
   }
 
   req.body.admins = req.user._id;
@@ -24,6 +24,10 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
 
 orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('GET: /api/org/orgId');
+
+  if(!req.params.orgId) {
+    return next(createError(400,'Bad Request'));
+  }
 
   Org.findById(req.params.orgId)
     .then( org => res.json(org))
