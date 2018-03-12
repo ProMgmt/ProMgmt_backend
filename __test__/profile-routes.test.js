@@ -112,7 +112,6 @@ describe('Profile Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .end((err, res) => {
-          console.log(this.tempUser);
           expect(res.status).toEqual(404);
           done();
         });
@@ -164,7 +163,6 @@ describe('Profile Routes', function() {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
-
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
@@ -177,7 +175,7 @@ describe('Profile Routes', function() {
     });
 
     describe('with invalid usage', () => {
-      it.only('should respond with a 404 for an ID that is not found', done => {
+      it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/profile/123`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -189,13 +187,22 @@ describe('Profile Routes', function() {
       });
 
       it('should respond with a 400 if no ID is provided', done => {
-        // TODO: add test
-        done();
+        superagent.get(`${url}/api/profile/`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(400);
+          done();
+        })
       });
 
-      it('should respond with a 401 if no token was provided', done => {
-        // TODO: add test
-        done();
+      it.only('should respond with a 401 if no token was provided', done => {
+        superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
+        .end((err, res) => {
+          expect(res.status).toEqual(401);
+          done();
+        });
       });  
     });
   });

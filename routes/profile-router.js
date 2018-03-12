@@ -6,6 +6,7 @@ const jsonParser = require('body-parser').json();
 const Router = require('express').Router;
 const bearerAuth = require('../lib/bearer-auth.js');
 const Profile = require('../model/profile.js');
+const User = require('../model/user.js');
 
 const profileRouter = module.exports = Router();
 
@@ -17,12 +18,16 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
   req.body.userId = req.user._id;
 
   if(!req.body.userId) {
-    return next(createError(400, 'user id not found'))
+    return next(createError(400, 'user id required'))
   }
 
-  // if (!req.checkBody('userId').exists()) {
-  //   return next(createError(404, 'user id not found'))
-  // }
+  User.findById(req.body.userId)
+  .then( user => {
+    res.json(user);
+  })
+  .catch( err => {
+    return next(createError(404, 'user id not found'))
+  })
 
   new Profile(req.body).save()
     .then( profile => res.json(profile))
@@ -34,9 +39,15 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next) {
   debug('GET: /api/profile/profileId');
 
+  if(!req.params.profileId) {
+    return next(createError(400, 'profile id requried'))
+  }
+
   Profile.findById(req.params.profileId)
-    .then( profile => res.json(profile))
-    .catch(next);
+    .then( profile => {
+      if(!profile) return next(createError(404, 'id not found'))
+    })
+    .catch(done);
 });
 
 //PUT ROUTE
