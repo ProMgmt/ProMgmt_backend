@@ -17,10 +17,6 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 
   req.body.userId = req.user._id;
 
-  if(!req.params.userId) {
-    return next(createError(404, 'user id required'));
-  }
-
   User.findById(req.body.userId)
     .then( () => {
       return new Profile(req.body).save();
@@ -30,6 +26,8 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
       return next(createError(400, 'no request body provided'));
     });
 });
+ 
+
 
 //GET ROUTE
 
