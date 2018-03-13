@@ -134,7 +134,6 @@ describe('User Routes', function() {
         .then( user => user.save() )
         .then( user => {
           this.tempUser = user;
-          console.log('userId', this.tempUser._id);
           return user.generateToken();
         })
         .then( token => {

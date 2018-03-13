@@ -11,6 +11,7 @@ const userRouter = require('./routes/user-router.js');
 const profileRouter = require('./routes/profile-router.js');
 const orgRouter = require('./routes/org-router.js');
 const projectRouter = require('./routes/project-router.js');
+
 const taskRouter = require('./routes/task-router.js');
 const errors = require('./lib/err-middleware.js');
 
@@ -26,7 +27,9 @@ app.use(userRouter);
 app.use(profileRouter);
 app.use(orgRouter);
 app.use(projectRouter);
+
 app.use(taskRouter);
+
 app.use(errors);
 
 const server = module.exports = app.listen(PORT, () => {
