@@ -32,7 +32,7 @@ describe('Project Routes', function() {
   });
 
   afterAll( done => {
-    serverToggle.serverOn(server, done);
+    serverToggle.serverOff(server, done);
   });
 
   beforeEach( done => {
