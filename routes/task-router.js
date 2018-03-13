@@ -13,39 +13,34 @@ const taskRouter = module.exports = Router();
 taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/project/:projectId/task');
 
-  if(req.body.desc === undefined) return next(createError(400, 'bad request'));
+  console.log('request body for task creation', req.body);
+  if (req.body.desc === undefined) return next(createError(400, 'bad request'));
 
   Project.findByIdAndAddTask(req.params.projectId, req.body, req.user._id)
     .then( task => res.json(task))
-    .catch(next);
+    .catch(err => next(err));
 });
 
 taskRouter.get('/api/task/:taskId', bearerAuth, function(req, res, next) {
   debug('GET: /api/task/taskId');
 
   Task.findById(req.params.taskId)
-    .then(task => res.json(task))
+    .then(task => {
+      if (!task) return next(createError(404));
+      return res.json(task);
+    })
     .catch(next);
-});
-
-taskRouter.get('/api/task/', bearerAuth, function(req, res, next) {
-  debug('GET: /api/task/');
-
-  next(createError(400, 'bad request'));
 });
 
 taskRouter.put('/api/task/:taskId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/task/taskId');
 
   Task.findByIdAndUpdate(req.params.taskId, req.body, { new: true})
-    .then( task => res.json(task))
+    .then( task => {
+      if (!task) return next(createError(404));
+      return res.json(task);
+    })
     .catch(next);
-});
-
-taskRouter.put('/api/task/', bearerAuth, jsonParser, function(req, res, next) {
-  debug('PUT: /api/task/');
-
-  next(createError(400, 'bad request'));
 });
 
 taskRouter.delete('/api/task/:taskId', bearerAuth, function(req, res, next) {
@@ -66,4 +61,10 @@ taskRouter.delete('/api/task/:taskId', bearerAuth, function(req, res, next) {
     })
     .then( () => res.sendStatus(204))
     .catch(next);
+});
+
+taskRouter.all('/api/task/', bearerAuth, jsonParser, function(req, res, next) {
+  debug('ALL: /api/task/');
+
+  return next(createError(400, 'bad request'));
 });

@@ -157,7 +157,7 @@ describe('Project Routes', function() {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.put(`${url}/api/project/12345`)
+        superagent.put(`${url}/api/project/5aa837baaaaa3f3e1055ba95`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })

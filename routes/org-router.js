@@ -30,7 +30,10 @@ orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   }
 
   Org.findById(req.params.orgId)
-    .then( org => res.json(org))
+    .then( org => {
+      if (!org) return next(createError(404));
+      return res.json(org);
+    })
     .catch(next);
 });
 
