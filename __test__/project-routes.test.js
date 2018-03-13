@@ -3,6 +3,7 @@
 const superagent = require('superagent');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
+const hooks = require('../lib/test-hooks.js');
 const User = require('../model/user.js');
 const Project = require('../model/project.js');
 const Org = require('../model/org.js');
@@ -11,12 +12,6 @@ const PORT = process.env.PORT || 3000;
 require('jest');
 
 const url = `http://localhost:${PORT}`;
-
-const exampleUser = {
-  username: 'orgtestuser',
-  password: 'password~',
-  email: 'orgtestemail@gmail.com',
-};
 
 const exampleOrg = {
   name: 'example organization',
@@ -41,15 +36,15 @@ describe('Project Routes', function() {
   });
 
   beforeEach( done => {
-    new User(exampleUser)
-      .generatePasswordHash(exampleUser.password)
+    new User(hooks.exampleUser)
+      .generatePasswordHash(hooks.exampleUser.password)
       .then(user => user.save())
       .then(user => {
         this.tempUser = user;
         return user.generateToken();
       })
       .then(token => {
-        this.tempToken = token;
+        hooks.tempToken = token;
         done();
       })
       .catch(done);
@@ -99,7 +94,7 @@ describe('Project Routes', function() {
         superagent.post(`${url}/api/org/${this.tempOrg._id}/project`)
           .send(exampleProject)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if (err) return done(err);
@@ -117,7 +112,7 @@ describe('Project Routes', function() {
         superagent.post(`${url}/api/org/${this.tempOrg._id}/project`)
           .send({ desc: 'wooo' })
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -143,7 +138,7 @@ describe('Project Routes', function() {
       it('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/project/${this.tempProject._id}`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if (err) return done(err);
@@ -159,7 +154,7 @@ describe('Project Routes', function() {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/project/4aa6f27fa2e45c6d26827bb1`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(404);
@@ -170,7 +165,7 @@ describe('Project Routes', function() {
       it('should respond with a 400 if no ID is provided', done => {
         superagent.get(`${url}/api/project/`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -195,7 +190,7 @@ describe('Project Routes', function() {
       it('should return a 200 status code for valid requests', done => {
         superagent.put(`${url}/api/project/${this.tempProject._id}`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .send({ projectName: 'weeee' })
           .end((err, res) => {
@@ -212,7 +207,7 @@ describe('Project Routes', function() {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.put(`${url}/api/project/12345`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .send({ projectName: 'id not found test' })
           .end((err, res) => {
@@ -225,7 +220,7 @@ describe('Project Routes', function() {
       it('should respond with a 400 if no ID is provided', done => {
         superagent.put(`${url}/api/project/`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .send({ projectName: 'no ID provided test'})
           .end((err, res) => {
@@ -252,7 +247,7 @@ describe('Project Routes', function() {
       it('should return a 204 when item has been deleted', done => {
         superagent.delete(`${url}/api/project/${this.tempProject._id}`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(204);
