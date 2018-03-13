@@ -8,6 +8,7 @@ const profileSchema = Schema({
   lastName: {type: String, required: true},
   userId: {type: Schema.Types.ObjectId, required: true},
   orgId: [{type: Schema.Types.ObjectId, ref: 'org'}],
+  profileId: {type: Schema.Types.ObjectId, ref: 'profile'},
   desc: {type: String, required: true},
   createdDate: {type: Date, required: true, default: Date.now},
   company: {type: String},
