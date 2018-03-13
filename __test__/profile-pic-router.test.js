@@ -120,13 +120,14 @@ describe('Profile Picture Routes', function() {
           });
       });
 
-      it('should return a 404 with improper profile id', done => {
+      it.only('should return a 404 with improper profile id', done => {
         superagent.post(`${url}/api/profile//pic`)
           .set({
             Authorization: `Bearer ${this.tempToken}`,
           })
           .attach('image', exampleProfilePic.image)
           .end((err, res) => {
+            console.log('res', res)
             expect(res.status).toEqual(404);
             done();
           });
