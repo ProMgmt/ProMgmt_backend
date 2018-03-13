@@ -9,7 +9,7 @@ const Router = require('express').Router;
 const createError = require('http-errors');
 const debug = require('debug')('promgmt:profile-pic-router');
 
-const ProfilePic = require('../model.profile-pic.js');
+const ProfilePic = require('../model/profile-pic.js');
 const Profile = require('../model/profile.js');
 const bearerAuth = require('../lib/bearer-auth.js');
 const profilePicRouter = module.exports = Router();
@@ -33,7 +33,7 @@ function s3uploadProm(params) {
 profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('image'), function(req, res, next) {
   debug('POST: /api/profile/profileId/pic');
 
-  if(!req.file.path) {
+  if(!req.file) {
     return next(createError(400, 'file not found'));
   }
 
@@ -66,7 +66,7 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
       return new ProfilePic(picData).save();
     })
     .then( profilePic => res.json(profilePic))
-    .catch( err => next(err));
+    .catch( err => next(createError(404, err)));
 });
 
 
