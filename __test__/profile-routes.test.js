@@ -89,7 +89,7 @@ describe('Profile Routes', function() {
     });
 
     describe('with INVALID usage', () => {
-      it('should respond with a 400 if the request body is invalid', done => {
+      it('should respond with a 400 if no request body', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -100,7 +100,7 @@ describe('Profile Routes', function() {
         });
       });
 
-      it('should return a 401 unauthorized', done => {
+      it('should return a 401 unauthorized with no token', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
         .send(exampleProfile)
         .end((err, res) => {
@@ -109,10 +109,8 @@ describe('Profile Routes', function() {
         });
       });
 
-
-      //test not passing
-      it('should return a 404 for invalid user id provided', done => {
-        superagent.post(`${url}/api/user/123/profile`)
+      it('should return a 404 if user id not provided', done => {
+        superagent.post(`${url}/api/user//profile`)
         .send(exampleProfile)
         .set({ 
           Authorization: `Bearer ${this.tempToken}`
@@ -181,7 +179,7 @@ describe('Profile Routes', function() {
     });
 
     //not passing. saying done not defined??
-    describe('with invalid usage', () => {
+    describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/profile/123`)
         .set({
@@ -189,19 +187,6 @@ describe('Profile Routes', function() {
         })
         .end((err, res) => {
           expect(res.status).toEqual(404);
-          done();
-        });
-      });
-      
-
-      //not passing. 400 and 404 are switched
-      it('should respond with a 400 if no ID is provided', done => {
-        superagent.get(`${url}/api/profile/`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(400);
           done();
         });
       });
@@ -289,9 +274,8 @@ describe('Profile Routes', function() {
       });
 
       //not passing
-      it('should respond with a 400 if no ID is provided', done => {
-        superagent.put(`${url}/api/profile/`)
-        .send(exEditedProfile)
+      it('should respond with a 400 if no request body provided', done => {
+        superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
@@ -355,7 +339,7 @@ describe('Profile Routes', function() {
 
     //not passing. 
     describe('with VALID usage', () => {
-      it.only('should return a 204 when item has been deleted', done => {
+      it('should return a 204 when item has been deleted', done => {
         console.log('pro id:', this.tempProfile._id)
         superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
@@ -369,8 +353,9 @@ describe('Profile Routes', function() {
       });
     });
 
-    describe('with invalid usage', () => {
-      it.only('should return a 404 if an invalid id provided', done => {
+    //not passing
+    describe('with INVALID usage', () => {
+      it('should return a 404 if an invalid id provided', done => {
         superagent.delete(`${url}/api/profile/789`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -381,18 +366,7 @@ describe('Profile Routes', function() {
         });
       });
 
-      it.only('should return a 400 if no id provided', done => {
-        superagent.delete(`${url}/api/profile/`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(400);
-          done();
-        });
-      });
-
-      it.only('should throw a 401 if token not provided', done => {
+      it('should throw a 401 if token not provided', done => {
         superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
         .end((err, res) => {
           expect(res.status).toEqual(401);

@@ -17,8 +17,8 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 
   req.body.userId = req.user._id;
 
-  if(!req.body.userId) {
-    return next(createError(400, 'user id required'))
+  if(!req.params.userId) {
+    return next(createError(404, 'user id required'))
   }
 
   User.findById(req.body.userId)
@@ -40,10 +40,10 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
   debug('GET: /api/profile/profileId');
 
   if(!req.params.profileId) {
-    return next(createError(400, 'no profile id provided'));
+    return next(createError(404, 'no profile id provided'));
   }
 
-  Profile.findById(req.params.profileId)
+  Profile.findById(req.body.profileId)
     .then( profile => {
       if(!profile) return next(createError(404, 'id not found'))
     })
@@ -55,11 +55,9 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
 profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile/profileId');
 
-  if(!req.body.profileId) {
+  if(!req.params.profileId) {
     res.status(400).send();
   }
-
-
 
   if(req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
 
@@ -77,11 +75,11 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
 profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile/profileId');
 
-  if(!req.body.profileId) {
-    res.status(400).send();
+  if(!req.params.profileId) {
+    res.status(404).send();
   }
 
   Profile.findByIdAndRemove(req.params.profileId)
-    .then( () => res.status(204).send())
+    .then( () => next(createError(204, 'profile deleted')))
     .catch( err => next(createError(404, err.message)));
 });
