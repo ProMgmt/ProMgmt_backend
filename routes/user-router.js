@@ -13,9 +13,8 @@ const userRouter = module.exports = Router();
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
 
-  if(!req.body.username || !req.body.email) {
-    return next(createError(400, 'Bad Request'));
-  }
+  if(req.body.username === undefined || req.body.email === undefined || req.body.password === undefined) return next(createError(400, 'Bad Request'));
+
 
   let password = req.body.password;
   delete req.body.password;
@@ -28,11 +27,14 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
     .catch(next);
 });
 
-userRouter.get('/api/login', basicAuth, function(req, res, next) {
-  debug('GET: /api/login');
+userRouter.get('/api/signin', basicAuth, function(req, res, next) {
+  debug('GET: /api/signin');
 
-  User.findOne({ username: req.auth.username })
-    .then( user => user.comparePasswordHash(req.auth.password))
+  User.findOne({ username: req.auth.username }) 
+    .then( user => {
+      if(!user) next(createError(404, 'username not found'));
+      return user.comparePasswordHash(req.auth.password);
+    })
     .then( user => user.generateToken())
     .then( token => res.send(token))
     .catch(next);
