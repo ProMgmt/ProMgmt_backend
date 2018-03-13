@@ -351,7 +351,7 @@ describe('Profile Routes', function() {
 
     //not passing
     describe('with INVALID usage', () => {
-      it('should return a 404 if an invalid id provided', done => {
+      it.only('should return a 404 if an invalid id provided', done => {
         superagent.delete(`${url}/api/profile/789`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
