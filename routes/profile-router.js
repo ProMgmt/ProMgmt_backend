@@ -18,17 +18,17 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
   req.body.userId = req.user._id;
 
   if(!req.params.userId) {
-    return next(createError(404, 'user id required'))
+    return next(createError(404, 'user id required'));
   }
 
   User.findById(req.body.userId)
-  .then( () => {
-    return new Profile(req.body).save()
-  })
-  .then( profile => res.json(profile))
-  .catch( err => {
-    return next(createError(400, 'no request body provided'))
-  })
+    .then( () => {
+      return new Profile(req.body).save();
+    })
+    .then( profile => res.json(profile))
+    .catch( err => {
+      return next(createError(400, 'no request body provided'));
+    });
 });
 
 //GET ROUTE
@@ -36,15 +36,13 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next) {
   debug('GET: /api/profile/profileId');
 
-  if(!req.params.profileId) {
-    return next(createError(404, 'profile id not found'));
-  }
+  
 
   Profile.findById(req.params.profileId)
     .then( profile => {
-      return res.json(profile)
+      return res.json(profile);
     })
-    .catch( err => next(createError(404, 'invalid profile id')));
+    .catch(next);
 });
 
 //PUT ROUTE
@@ -52,9 +50,7 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
 profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile/profileId');
 
-  if(!req.params.profileId) {
-    res.status(404).send();
-  }
+  
 
   if(req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
 
@@ -65,7 +61,7 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
         next(createError(404, err.message));
       });
   } else {
-    return next(createError(400, 'request body not provided'))
+    return next(createError(400, 'request body not provided'));
   }
 });
 
@@ -79,6 +75,12 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, n
   }
 
   Profile.findByIdAndRemove(req.params.profileId)
-    .then( () => next(createError(204, 'profile deleted')))
-    .catch( err => next(createError(404, err.message)));
+    .then( () => res.sendStatus(204))
+    .catch(next);
+});
+
+profileRouter.all('/api/profile/', bearerAuth, function(req, res, next) {
+  debug('Profile 400 Catch');
+
+  return next(createError(400,'no ID provided'));
 });
