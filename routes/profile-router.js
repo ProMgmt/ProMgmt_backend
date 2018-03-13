@@ -56,7 +56,7 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
   debug('PUT: /api/profile/profileId');
 
   if(!req.body.profileId) {
-    res.status(404).send();
+    res.status(400).send();
   }
 
 
@@ -78,7 +78,7 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, n
   debug('DELETE: /api/profile/profileId');
 
   if(!req.body.profileId) {
-    res.status(404).send();
+    res.status(400).send();
   }
 
   Profile.findByIdAndRemove(req.params.profileId)

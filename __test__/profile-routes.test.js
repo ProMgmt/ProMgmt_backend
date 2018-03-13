@@ -288,7 +288,8 @@ describe('Profile Routes', function() {
         })
       });
 
-      it.only('should respond with a 400 if no ID is provided', done => {
+      //not passing
+      it('should respond with a 400 if no ID is provided', done => {
         superagent.put(`${url}/api/profile/`)
         .send(exEditedProfile)
         .set({
@@ -315,11 +316,89 @@ describe('Profile Routes', function() {
   // DELETE ROUTE TESTS
 
   describe('DELETE /api/profile/:profileId', () => {
-    describe('with VALID usage', () => {
-      it('should return a 204 when item has been deleted', done => {
-        // TODO: add test
-        done();
+    beforeEach( done => {
+      let user = new User(exampleUser)
+      user.generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken()
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+
+    beforeEach( done => {
+      exampleProfile.userId = this.tempUser._id;
+      new Profile(exampleProfile).save()
+        .then( profile => {
+          this.tempProfile = profile;
+          done();
+        })
+        .catch(done)
       });
+
+      afterEach( done => {
+        User.remove({})
+          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+          .catch(done);
+      });
+  
+      afterEach( done => {
+        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+          .then( () => done())
+          .catch(done);
+      });
+
+    //not passing. 
+    describe('with VALID usage', () => {
+      it.only('should return a 204 when item has been deleted', done => {
+        console.log('pro id:', this.tempProfile._id)
+        superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          expect(res.status).toEqual(204);
+          done();
+        });
+      });
+    });
+
+    describe('with invalid usage', () => {
+      it.only('should return a 404 if an invalid id provided', done => {
+        superagent.delete(`${url}/api/profile/789`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(404);
+          done();
+        });
+      });
+
+      it.only('should return a 400 if no id provided', done => {
+        superagent.delete(`${url}/api/profile/`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(400);
+          done();
+        });
+      });
+
+      it.only('should throw a 401 if token not provided', done => {
+        superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
+        .end((err, res) => {
+          expect(res.status).toEqual(401);
+          done();
+        })
+      })
     });
   });
 });
