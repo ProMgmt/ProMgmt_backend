@@ -13,7 +13,6 @@ const taskRouter = module.exports = Router();
 taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/project/:projectId/task');
 
-  console.log('request body for task creation', req.body);
   if (req.body.desc === undefined) return next(createError(400, 'bad request'));
 
   Project.findByIdAndAddTask(req.params.projectId, req.body, req.user._id)

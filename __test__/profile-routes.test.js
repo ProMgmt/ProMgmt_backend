@@ -44,7 +44,6 @@ describe('Profile Routes', function () {
             expect(res.body.desc).toEqual(hooks.exampleProfile.desc.toString());
             expect(res.body.firstName).toEqual(hooks.exampleProfile.firstName.toString());
             expect(res.body.lastName).toEqual(hooks.exampleProfile.lastName.toString());
-
             done();
           });
       });
@@ -114,14 +113,13 @@ describe('Profile Routes', function () {
     });
 
     describe('with INVALID usage', () => {
-      it('should respond with a 404 if no ID is provided', done => {
+      it('should respond with a 400 if no ID is provided', done => {
         superagent.get(`${url}/api/profile/`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
-            expect(res.status).toEqual(404);
-
+            expect(res.status).toEqual(400);
             done();
           });
       });
@@ -130,6 +128,17 @@ describe('Profile Routes', function () {
         superagent.get(`${url}/api/profile/${hooks.tempProfile._id}`)
           .end((err, res) => {
             expect(res.status).toEqual(401);
+            done();
+          });
+      });
+
+      it('should respond with a 404 if an invalid ID is provided', done => {
+        superagent.get(`${url}/api/profile/5aa8256daf1ce7aaaa93f5aa`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
             done();
           });
       });
@@ -162,7 +171,6 @@ describe('Profile Routes', function () {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-
         superagent.put(`${url}/api/profile/5aa8256daf1ce7aaaa93f5aa`)
           .send(hooks.updatedProfile)
           .set({

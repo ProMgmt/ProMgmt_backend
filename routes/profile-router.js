@@ -34,13 +34,12 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, next) {
   debug('GET: /api/profile/profileId');
 
-
   Profile.findById(req.params.profileId)
     .then(profile => {
-      return res.json(profile);
+      if (!profile) return next(createError(404));
+      res.json(profile);
     })
-    .catch(() => next(createError(404, 'invalid profile id')));
-
+    .catch(next);
 });
 
 //PUT ROUTE
@@ -49,20 +48,14 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function (r
   debug('PUT: /api/profile/profileId');
 
 
-  if (req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
+  if (req.body.firstName === undefined && req.body.lastName === undefined && req.body.desc === undefined && req.body.title === undefined && req.body.company === undefined && req.body.avatarURI === undefined)     return next(createError(400, 'request body not provided'));
 
-    Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
-      .then(profile => {
-        if (!profile) return next(createError(404));
-        return res.json(profile);
-      })
-      .catch(err => {
-        if (err.name === 'ValidationError') return next(err);
-        next(createError(404, err.message));
-      });
-  } else {
-    return next(createError(400, 'request body not provided'));
-  }
+  Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
+    .then(profile => {
+      if (!profile) return next(createError(404));
+      return res.json(profile);
+    })
+    .catch(next);
 });
 
 //DELETE ROUTE
@@ -75,12 +68,12 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function (req, res, 
     .then(() => {
       return res.sendStatus(204, 'profile deleted');
     })
-    .catch(err => next(createError(404, err.message)));
+    .catch(next);
 });
 
 profileRouter.all('/api/profile', function(req, res, next) {
   debug('ALL: /api/profile');
 
-  return next(createError(404));
+  return next(createError(400));
 });
 
