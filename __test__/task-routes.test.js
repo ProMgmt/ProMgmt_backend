@@ -1,7 +1,6 @@
 'use strict';
 
 const superagent = require('superagent');
-const debug = require('debug')('promgmt:task-routes.test');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
 const User = require('../model/user.js');
@@ -115,7 +114,7 @@ describe('Task Routes', function() {
     task.projectId = this.tempProject._id;
     task.orgId = this.tempOrg._id;
     task.admins.push(this.tempUser._id);
-    task.dependentTasks.push(this.tempTask1._id);
+    task.dependentTasks.push(this.tempTask._id);
     task.save()
       .then(task => {
         this.tempTask2 = task;
