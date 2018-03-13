@@ -5,29 +5,12 @@
 const superagent = require('superagent');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
-const User = require('../model/user.js');
-const Org = require('../model/org.js');
+const hooks = require('../lib/test-hooks.js');
 const PORT = process.env.PORT || 3000;
 
 require('jest');
 
 const url = `http://localhost:${PORT}`;
-
-const exampleUser = {
-  username: 'test name',
-  email: 'test@email.com',
-  password: '1234',
-};
-
-const exampleOrg = {
-  name: 'example org',
-  desc: 'this is a test',
-};
-
-const updateOrg = {
-  name: 'update org',
-  desc: 'update test',
-};
 
 describe('Org Routes', function() {
   beforeAll( done => {
@@ -39,41 +22,26 @@ describe('Org Routes', function() {
   });
 
   afterEach( done => {
-    Promise.all([
-      User.remove({}),
-      Org.remove({}),
-    ])
-      .then( () => done())
-      .catch(done);
+    hooks.removeDBInfo(done);
   });
 
   describe('POST /api/org', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save())
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
+
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/org`)
-          .send(exampleOrg)
+          .send(hooks.exampleOrg)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);
             expect(res.status).toEqual(200);
-            expect(res.body.name).toEqual(exampleOrg.name);
-            expect(res.body.desc).toEqual(exampleOrg.desc);
+            expect(res.body.name).toEqual(hooks.exampleOrg.name);
+            expect(res.body.desc).toEqual(hooks.exampleOrg.desc);
             done();
           });
       });
@@ -86,7 +54,7 @@ describe('Org Routes', function() {
         superagent.post(`${url}/api/org`)
           .send({})
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -100,43 +68,27 @@ describe('Org Routes', function() {
 
   describe('GET /api/org/:orgId', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
 
     beforeEach( done => {
-      exampleOrg.userID = this.tempUser._id.toString();
-      new Org(exampleOrg).save()
-        .then( org => {
-          this.tempOrg = org;
-          done();
-        })
-        .catch(done);
+      hooks.createOrg(done);
     });
 
     afterEach( () => {
-      delete exampleOrg.userID;
+      delete hooks.exampleOrg.userID;
     });
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        superagent.get(`${url}/api/org/${this.tempOrg._id}`)
+        superagent.get(`${url}/api/org/${hooks.tempOrg._id}`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);
             expect(res.status).toEqual(200);
-            expect(res.body.name).toEqual(exampleOrg.name);
-            expect(res.body.desc).toEqual(exampleOrg.desc);
+            expect(res.body.name).toEqual(hooks.exampleOrg.name);
+            expect(res.body.desc).toEqual(hooks.exampleOrg.desc);
             done();
           });
       });
@@ -146,7 +98,7 @@ describe('Org Routes', function() {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/org/12345`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             console.log(err.message);
@@ -161,7 +113,7 @@ describe('Org Routes', function() {
         
 
       it('should respond with a 401 if no token was provided', done => {
-        superagent.get(`${url}/api/org/${this.tempOrg}`)
+        superagent.get(`${url}/api/org/${hooks.tempOrg}`)
           .set({
             Authorization: ``,
           })
@@ -176,44 +128,28 @@ describe('Org Routes', function() {
 
   describe('PUT /api/org/:orgId', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
 
     beforeEach( done => {
-      exampleOrg.userID = this.tempUser._id.toString();
-      new Org(exampleOrg).save()
-        .then( org => {
-          this.tempOrg = org;
-          done();
-        })
-        .catch(done);
+      hooks.createOrg(done);
     });
 
     afterEach( () => {
-      delete exampleOrg.userID;
+      delete hooks.exampleOrg.userID;
     });
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        superagent.put(`${url}/api/org/${this.tempOrg._id}`)
-          .send(updateOrg)
+        superagent.put(`${url}/api/org/${hooks.tempOrg._id}`)
+          .send(hooks.updateOrg)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);
             expect(res.status).toEqual(200);
-            expect(res.body.name).toEqual(updateOrg.name);
-            expect(res.body.desc).toEqual(updateOrg.desc);
+            expect(res.body.name).toEqual(hooks.updateOrg.name);
+            expect(res.body.desc).toEqual(hooks.updateOrg.desc);
             done();
           });
       });
@@ -222,9 +158,9 @@ describe('Org Routes', function() {
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.put(`${url}/org/12345`)
-          .send(updateOrg)
+          .send(hooks.updateOrg)
           .set({
-            Authorization: `Beaer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(404);
@@ -234,10 +170,10 @@ describe('Org Routes', function() {
       });
 
       it('should respond with a 400 if no body is provided', done => {
-        superagent.put(`${url}/api/org/${this.tempOrg._id}`)
+        superagent.put(`${url}/api/org/${hooks.tempOrg._id}`)
           .send({})
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -247,8 +183,8 @@ describe('Org Routes', function() {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        superagent.put(`${url}/api/org/${this.tempOrg._id}`)
-          .send(updateOrg)
+        superagent.put(`${url}/api/org/${hooks.tempOrg._id}`)
+          .send(hooks.updateOrg)
           .set({
             Authorization: ``,
           })
@@ -263,37 +199,22 @@ describe('Org Routes', function() {
 
   describe('DELETE /api/org/:orgId', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
 
     beforeEach( done => {
-      exampleOrg.userID = this.tempUser._id.toString();
-      new Org(exampleOrg).save()
-        .then( org => {
-          this.tempOrg = org;
-          done();
-        })
-        .catch(done);
+      hooks.createOrg(done);
     });
 
     afterEach( () => {
-      delete exampleOrg.userID;
+      delete hooks.tempUser.userID;
     });
+
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        superagent.delete(`${url}/api/org/${this.tempOrg._id}`)
+        superagent.delete(`${url}/api/org/${hooks.tempOrg._id}`)
           .set({
-            Authorization: `Bearer ${this.tempToken}`,
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);

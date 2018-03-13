@@ -8,7 +8,7 @@
   },
   "scripts": {
     "coverage": "DEBUG='promgmt*' jest -i --coverage __test__/project-routes.test.js",
-    "test": "DEBUG='promgmt*' jest -i __test__/project-routes.test.js",
+    "test": "DEBUG='promgmt*' jest -i __test__/org-routes.test.js",
     "start": "DEBUG='promgmt*' node server.js"
   },
   "repository": {
