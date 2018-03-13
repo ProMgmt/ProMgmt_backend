@@ -115,7 +115,7 @@ describe('Task Routes', function() {
     task.projectId = this.tempProject._id;
     task.orgId = this.tempOrg._id;
     task.admins.push(this.tempUser._id);
-    task.dependentTasks.push(this.tempTask1._id);
+    task.dependentTasks.push(this.tempTask._id);
     task.save()
       .then(task => {
         this.tempTask2 = task;
