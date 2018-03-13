@@ -24,6 +24,8 @@ Project.findByIdAndAddTask = function(id, task, userId){
 
   return Project.findById(id)
     .then( project => {
+      if(!project) return createError(404);
+      console.log('project', project);
       task.projectId = project._id;
       task.orgId = project.orgId;
       task.admins = [];
@@ -35,10 +37,12 @@ Project.findByIdAndAddTask = function(id, task, userId){
       });
       this.tempProject = project;
       return new Task(task).save();
-    }).then( task => {
+    })
+    .then( task => {
       this.tempProject.tasks.push(task._id);
       this.tempTask = task;
       return this.tempProject.save();
-    }).then(() => this.tempTask)
-    .catch(err => Promise.reject(createError(400, err.message)));
+    })
+    .then(() => this.tempTask)
+    .catch(err => Promise.reject(err));
 };

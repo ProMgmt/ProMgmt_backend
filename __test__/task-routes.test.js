@@ -106,7 +106,7 @@ describe('Task Routes', function() {
 
     describe('with invalid usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.get(`${url}/api/task/123`)
+        superagent.get(`${url}/api/task/5aa825aaaaace7271e93f5aa`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
@@ -165,7 +165,7 @@ describe('Task Routes', function() {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.put(`${url}/api/task/123`)
+        superagent.put(`${url}/api/task/5aa825aaaaace7271e93f5aa`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })

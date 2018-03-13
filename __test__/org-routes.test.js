@@ -96,7 +96,7 @@ describe('Org Routes', function() {
 
     describe('with invalid usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.get(`${url}/api/org/12345`)
+        superagent.get(`${url}/api/org/5aa8256daf1ce7aaaa93f5aa`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
@@ -108,13 +108,10 @@ describe('Org Routes', function() {
         
       });
 
-      
-        
-
       it('should respond with a 401 if no token was provided', done => {
-        superagent.get(`${url}/api/org/${hooks.tempOrg}`)
+        superagent.get(`${url}/api/org/${hooks.tempOrg._id}`)
           .set({
-            Authorization: ``,
+            Authorization: `Bearer `,
           })
           .end((err, res) => {
             expect(res.status).toEqual(401);
@@ -122,6 +119,17 @@ describe('Org Routes', function() {
             done();
           });
       });  
+
+      it('should respond with a 400 if no ID was provided', done => {
+        superagent.get(`${url}/api/org`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
     });
   });
 
@@ -156,7 +164,7 @@ describe('Org Routes', function() {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.put(`${url}/org/12345`)
+        superagent.put(`${url}/org/5aa837b0f95a3f3eaaaaaa95`)
           .send(hooks.updateOrg)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
