@@ -17,7 +17,6 @@ const url = `http://localhost:${PORT}`;
 
 describe('Profile Routes', function () {
   beforeAll(done => {
-
     serverToggle.serverOn(server, done);
   });
 
@@ -62,7 +61,6 @@ describe('Profile Routes', function () {
         superagent.post(`${url}/api/user/${hooks.tempUser._id}/profile`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
-
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -74,7 +72,6 @@ describe('Profile Routes', function () {
 
         superagent.post(`${url}/api/user/${hooks.tempUser._id}/profile`)
           .send(hooks.exampleProfile)
-
           .end((err, res) => {
             expect(res.status).toEqual(401);
             done();
@@ -82,12 +79,22 @@ describe('Profile Routes', function () {
       });
 
       it('should return a 404 if user id not provided', done => {
-
         superagent.post(`${url}/api/user/profile`)
           .send(hooks.exampleProfile)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
+      });
 
+      it('should return a 404 if user is not found', done => {
+        superagent.post(`${url}/api/user/5aa8256daf1ce7271aaaaaaa/profile`)
+          .send(hooks.exmapleProfile)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             expect(res.status).toEqual(404);
@@ -129,9 +136,8 @@ describe('Profile Routes', function () {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.get(`${url}/api/profile/`)
+        superagent.get(`${url}/api/profile/5aa82ee3157f68aaaaaa024c`)
           .set({
-
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
@@ -142,9 +148,7 @@ describe('Profile Routes', function () {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-
         superagent.get(`${url}/api/profile/${hooks.tempProfile._id}`)
-
           .end((err, res) => {
             expect(res.status).toEqual(401);
             done();
@@ -183,7 +187,6 @@ describe('Profile Routes', function () {
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-
         superagent.put(`${url}/api/profile/5aa8256daf1ce7271e93f5aa`)
           .send(hooks.updatedProfile)
           .set({
@@ -196,12 +199,10 @@ describe('Profile Routes', function () {
           });
       });
 
-      it('should respond with a 400 if no request body provided', done => {
-
-        superagent.put(`${url}/api/profile/${hooks.tempProfile._id}`)
+      it('should respond with a 400 if no ID is provided', done => {
+        superagent.put(`${url}/api/profile/`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
-
           })
           .end((err, res) => {
             expect(res.status).toEqual(400);
@@ -210,17 +211,13 @@ describe('Profile Routes', function () {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-
         superagent.put(`${url}/api/profile/${hooks.tempProfile._id}`)
           .send(hooks.updatedProfile)
-
           .end((err, res) => {
             expect(res.status).toEqual(401);
             done();
           });
-
       });
-
     });
   });
 
@@ -228,7 +225,6 @@ describe('Profile Routes', function () {
   // DELETE ROUTE TESTS
 
   describe('DELETE /api/profile/:profileId', () => {
-
     beforeEach(done => {
       hooks.createProfile(done);
     });
@@ -250,10 +246,8 @@ describe('Profile Routes', function () {
     });
       
     describe('with INVALID usage', () => {
-
       it('should throw a 401 if token not provided', done => {
         superagent.delete(`${url}/api/profile/${hooks.tempProfile._id}`)
-
           .end((err, res) => {
             expect(res.status).toEqual(401);
             done();

@@ -15,10 +15,11 @@ const profileRouter = module.exports = Router();
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
 
-  req.body.userId = req.user._id;
+  console.log('req.body', req.body);
+  req.body.userId = req.params.userId;
 
 
-  User.findById(req.body.userId)
+  User.findById(req.params.userId)
     .then(user => {
       if (!user) next(createError(404, 'user not found'));
       return;
@@ -37,10 +38,10 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, nex
 
   Profile.findById(req.params.profileId)
     .then(profile => {
+      if(!profile) next(createError(404, 'invalid profile ID'));
       return res.json(profile);
     })
-    .catch(() => next(createError(404, 'invalid profile id')));
-
+    .catch(next);
 });
 
 //PUT ROUTE
@@ -49,20 +50,12 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function (r
   debug('PUT: /api/profile/profileId');
 
 
-  if (req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
-
-    Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
-      .then(profile => {
-        if (!profile) return next(createError(404));
-        return res.json(profile);
-      })
-      .catch(err => {
-        if (err.name === 'ValidationError') return next(err);
-        next(createError(404, err.message));
-      });
-  } else {
-    return next(createError(400, 'request body not provided'));
-  }
+  Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
+    .then(profile => {
+      if (!profile) return next(createError(404));
+      return res.json(profile);
+    })
+    .catch(next);
 });
 
 //DELETE ROUTE
@@ -71,16 +64,14 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function (req, res, 
   debug('DELETE: /api/profile/profileId');
 
   Profile.findByIdAndRemove(req.params.profileId)
-
     .then(() => {
       return res.sendStatus(204, 'profile deleted');
     })
-    .catch(err => next(createError(404, err.message)));
+    .catch(next);
 });
 
 profileRouter.all('/api/profile', function(req, res, next) {
   debug('ALL: /api/profile');
 
-  return next(createError(404));
+  return next(createError(400));
 });
-

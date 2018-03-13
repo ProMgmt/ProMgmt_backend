@@ -19,7 +19,6 @@ describe('User Routes', function() {
     serverToggle.serverOff(server, done);
   });
 
-
   describe('POST /api/signup', () => {
     afterAll( done => {
       hooks.removeDBInfo(done);
