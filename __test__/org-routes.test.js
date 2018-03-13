@@ -101,7 +101,6 @@ describe('Org Routes', function() {
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
-            console.log(err.message);
             expect(res.status).toEqual(404);
             expect(err.message).toEqual('Not Found');
             done();
