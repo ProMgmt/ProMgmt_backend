@@ -103,8 +103,44 @@ describe('User Routes', function() {
             done();
           });
       });
+
+      it('should respond with a 401 if auth header is missing', done => {
+        superagent.get(`${url}/api/signin`)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
+
+      it('should return a 401 if no username in auth', done => {
+        superagent.get(`${url}/api/signin`)
+          .auth(``, `${hooks.exampleUser.password}`)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
+
+      it('should return a 401 if no password in auth', done => {
+        superagent.get(`${url}/api/signin`)
+          .auth(`${hooks.exampleUser.username}`, ``)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
+
+      it('should return a 401 if no password or username in auth', done => {
+        superagent.get(`${url}/api/signin`)
+          .auth({})
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
     });
   });
+          
 
   describe('DELETE /api/signin', () => {
     beforeEach( done => {
@@ -124,3 +160,5 @@ describe('User Routes', function() {
     });
   });
 });
+
+  
