@@ -15,19 +15,19 @@ const exampleUser = {
   username: 'example username',
   password: 'example password',
   email: 'exampleemail@test.com',
-}
+};
 
 const exampleProfile = {
   firstName: 'example first name', 
   lastName: 'example last name', 
   desc: 'example description',
-}
+};
 
 const exEditedProfile = {
   firstName: 'edited first name',
   lastName: 'edited last name',
   desc: 'edited description',
-}
+};
 
 describe('Profile Routes', function() {
   beforeAll( done => {
@@ -44,12 +44,12 @@ describe('Profile Routes', function() {
   describe('POST: /api/user/:userId/profile', () => {
    
     beforeEach( done => {
-      let user = new User(exampleUser)
+      let user = new User(exampleUser);
       user.generatePasswordHash(exampleUser.password)
         .then( user => user.save())
         .then( user => {
           this.tempUser = user;
-          return user.generateToken()
+          return user.generateToken();
         })
         .then( token => {
           this.tempToken = token;
@@ -73,52 +73,52 @@ describe('Profile Routes', function() {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
-        .send(exampleProfile)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if(err) return done(err);
-          expect(res.status).toEqual(200);
-          expect(res.body.desc).toEqual(exampleProfile.desc.toString());
-          expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
-          expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
-          done();
-        });
+          .send(exampleProfile)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.desc).toEqual(exampleProfile.desc.toString());
+            expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
+            expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
       it('should respond with a 400 if no request body', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(400);
-          done();
-        });
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
       });
 
       it('should return a 401 unauthorized with no token', done => {
         superagent.post(`${url}/api/user/${this.tempUser._id}/profile`)
-        .send(exampleProfile)
-        .end((err, res) => {
-          expect(res.status).toEqual(401);
-          done();
-        });
+          .send(exampleProfile)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
       });
 
       it('should return a 404 if user id not provided', done => {
         superagent.post(`${url}/api/user//profile`)
-        .send(exampleProfile)
-        .set({ 
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(404);
-          done();
-        });
+          .send(exampleProfile)
+          .set({ 
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
       });
     });
   });
@@ -128,12 +128,12 @@ describe('Profile Routes', function() {
 
   describe('GET /api/profile/:profileId', () => {
     beforeEach( done => {
-      let user = new User(exampleUser)
+      let user = new User(exampleUser);
       user.generatePasswordHash(exampleUser.password)
         .then( user => user.save())
         .then( user => {
           this.tempUser = user;
-          return user.generateToken()
+          return user.generateToken();
         })
         .then( token => {
           this.tempToken = token;
@@ -149,57 +149,57 @@ describe('Profile Routes', function() {
           this.tempProfile = profile;
           done();
         })
-        .catch(done)
-      });
+        .catch(done);
+    });
 
-      afterEach( done => {
-        User.remove({})
-          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
-          .catch(done);
-      });
+    afterEach( done => {
+      User.remove({})
+        .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+        .catch(done);
+    });
   
-      afterEach( done => {
-        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
-          .then( () => done())
-          .catch(done);
-      });
+    afterEach( done => {
+      Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+        .then( () => done())
+        .catch(done);
+    });
 
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        console.log(this.tempProfile._id)
+        console.log(this.tempProfile._id);
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if (err) return done(err);
-          expect(res.status).toEqual(200);
-          expect(res.body.desc).toEqual(exampleProfile.desc.toString());
-          expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
-          expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
-          done();
-        })
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.desc).toEqual(exampleProfile.desc.toString());
+            expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
+            expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/profile/`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(404);
-          done();
-        });
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
       });
 
       it('should respond with a 401 if no token was provided', done => {
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
-        .end((err, res) => {
-          expect(res.status).toEqual(401);
-          done();
-        });
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
       });  
     });
   });
@@ -209,12 +209,12 @@ describe('Profile Routes', function() {
 
   describe('PUT /api/profile/:profileId', () => {
     beforeEach( done => {
-      let user = new User(exampleUser)
+      let user = new User(exampleUser);
       user.generatePasswordHash(exampleUser.password)
         .then( user => user.save())
         .then( user => {
           this.tempUser = user;
-          return user.generateToken()
+          return user.generateToken();
         })
         .then( token => {
           this.tempToken = token;
@@ -230,69 +230,69 @@ describe('Profile Routes', function() {
           this.tempProfile = profile;
           done();
         })
-        .catch(done)
-      });
+        .catch(done);
+    });
 
-      afterEach( done => {
-        User.remove({})
-          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
-          .catch(done);
-      });
+    afterEach( done => {
+      User.remove({})
+        .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+        .catch(done);
+    });
   
-      afterEach( done => {
-        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
-          .then( () => done())
-          .catch(done);
-      });
+    afterEach( done => {
+      Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+        .then( () => done())
+        .catch(done);
+    });
 
 
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        console.log(this.tempProfile)
+        console.log(this.tempProfile);
         superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
-        .send(exEditedProfile)
-        .set({ 
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if(err) return done(err);
-          expect(res.status).toEqual(200);
-          done();
-        });
+          .send(exEditedProfile)
+          .set({ 
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.put(`${url}/api/profile/456`)
-        .send(exEditedProfile)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(404);
-          done();
-        })
+          .send(exEditedProfile)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
       });
 
       it('should respond with a 400 if no request body provided', done => {
         superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(400);
-          done();
-        });
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
       });
 
       it('should respond with a 401 if no token was provided', done => {
         superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
-        .send(exEditedProfile)
-        .end((err, res) => {
-          expect(res.status).toEqual(401);
-          done();
-        })
+          .send(exEditedProfile)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
       });  
     });
   });
@@ -302,12 +302,12 @@ describe('Profile Routes', function() {
 
   describe('DELETE /api/profile/:profileId', () => {
     beforeEach( done => {
-      let user = new User(exampleUser)
+      let user = new User(exampleUser);
       user.generatePasswordHash(exampleUser.password)
         .then( user => user.save())
         .then( user => {
           this.tempUser = user;
-          return user.generateToken()
+          return user.generateToken();
         })
         .then( token => {
           this.tempToken = token;
@@ -323,55 +323,55 @@ describe('Profile Routes', function() {
           this.tempProfile = profile;
           done();
         })
-        .catch(done)
-      });
+        .catch(done);
+    });
 
-      afterEach( done => {
-        User.remove({})
-          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
-          .catch(done);
-      });
+    afterEach( done => {
+      User.remove({})
+        .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+        .catch(done);
+    });
   
-      afterEach( done => {
-        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
-          .then( () => done())
-          .catch(done);
-      });
+    afterEach( done => {
+      Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+        .then( () => done())
+        .catch(done);
+    });
 
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        console.log('pro id:', this.tempProfile._id)
+        console.log('pro id:', this.tempProfile._id);
         superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          if(err) return done(err);
-          expect(res.status).toEqual(204);
-          done();
-        });
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(204);
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
       it('should return a 404 if an invalid id provided', done => {
         superagent.delete(`${url}/api/profile/789`)
-        .set({
-          Authorization: `Bearer ${this.tempToken}`
-        })
-        .end((err, res) => {
-          expect(res.status).toEqual(404);
-          done();
-        });
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
       });
 
       it('should throw a 401 if token not provided', done => {
         superagent.delete(`${url}/api/profile/${this.tempProfile._id}`)
-        .end((err, res) => {
-          expect(res.status).toEqual(401);
-          done();
-        })
-      })
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
     });
   });
 });
