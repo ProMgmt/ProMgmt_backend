@@ -19,18 +19,36 @@ const projectSchema = Schema({
 
 const Project = module.exports = mongoose.model('project', projectSchema);
 
-Project.findByIdAndAddTask = function(id, task){
+Project.findByIdAndAddTask = function(id, task, userId){
   debug('findByIdAndAddTask');
 
   return Project.findById(id)
     .then( project => {
       task.projectId = project._id;
+      task.orgId = project.orgId;
+      task.admins = [];
+      task.admins.push(userId.toString());
+      project.admins.forEach( admin => {
+        if(!task.admins.includes(admin.toString())){
+          task.admins.push(admin);
+        }
+      });
       this.tempProject = project;
       return new Task(task).save();
     }).then( task => {
       this.tempProject.tasks.push(task._id);
       this.tempTask = task;
-      return this.tempTask.save();
+      return this.tempProject.save();
     }).then(() => this.tempTask)
     .catch(err => Promise.reject(createError(400, err.message)));
+};
+
+Project.findByIdAndRemoveTask = function(projectId){
+  Project.findById(projectId)
+    // .populate('tasks')
+    .then( project => {
+      this.tempRemoveProject = project;
+      console.log('this.tempRemoveProject', this.tempRemoveProject);
+      console.log('this.tempProject.tasks[0]', this.tempRemoveProject.tasks[0]);
+    });
 };
