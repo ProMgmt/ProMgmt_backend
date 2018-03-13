@@ -50,39 +50,40 @@ describe('Profile Picture Routes', function() {
   });
 
   describe('POST: /api/profile/:profileId/pic', () => {
+    debug('POST: /api/profile/:profileId/pic');
+
+    beforeEach( done => {
+      new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken();
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+    
+    beforeEach( done => {
+      exampleProfile.userId = this.tempUser._id.toString();
+      new Profile(exampleProfile).save()
+        .then( profile => {
+          this.tempProfile = profile;
+          done();
+        })
+        .catch(done);
+    });
+    
+    afterEach( done => {
+      delete exampleProfile.userId;
+      done();
+    });
+    
     describe('with a valid token and data', () => {
-      beforeEach( done => {
-        new User(exampleUser)
-          .generatePasswordHash(exampleUser.password)
-          .then( user => user.save())
-          .then( user => {
-            this.tempUser = user;
-            return user.generateToken();
-          })
-          .then( token => {
-            this.tempToken = token;
-            done();
-          })
-          .catch(done);
-      });
-
-      beforeEach( done => {
-        exampleProfile.userId = this.tempUser._id.toString();
-        new Profile(exampleProfile).save()
-          .then( profile => {
-            this.tempProfile = profile;
-            done();
-          })
-          .catch(done);
-      });
-
-      afterEach( done => {
-        delete exampleProfile.userId;
-        done();
-      });
-
       it('should return an object containing our profile picture url', done => {
-        debug('POST: /api/profile/:profileId/pic');
 
         superagent.post(`${url}/api/profile/${this.tempProfile._id}/pic`)
           .set({
@@ -90,8 +91,43 @@ describe('Profile Picture Routes', function() {
           })
           .attach('image', exampleProfilePic.image)
           .end((err, res) => {
+            if (err) return done(err);
             expect(res.status).toEqual(200);
             expect(res.body.profileId).toEqual(this.tempProfile._id.toString());
+            done();
+          });
+      });
+    });
+
+    describe('with no token or data', () => {
+      it('should return a 400 with no file given', done => {
+        superagent.post(`${url}/api/profile/${this.tempProfile._id}/pic`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
+
+      it('should return a 401 without a token', done => {
+        superagent.post(`${url}/api/profile/${this.tempProfile._id}/pic`)
+          .attach('image', exampleProfilePic.image)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            done();
+          });
+      });
+
+      it('should return a 404 with improper profile id', done => {
+        superagent.post(`${url}/api/profile//pic`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .attach('image', exampleProfilePic.image)
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
             done();
           });
       });
