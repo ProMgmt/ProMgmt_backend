@@ -1,6 +1,7 @@
 'use strict';
 
 const superagent = require('superagent');
+const debug = require('debug')('promgmt:task-routes.test');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
 const User = require('../model/user.js');
@@ -16,7 +17,7 @@ const url = `http://localhost:${PORT}`;
 const exampleUser = {
   username: 'exampleName',
   password: '2468',
-  email: 'email@email.com'
+  email: 'email@email.com',
 };
 
 const exampleOrg = {
@@ -64,7 +65,7 @@ describe('Task Routes', function() {
   beforeEach( done => {
     let org = new Org(exampleOrg);
     org.admins.push(this.tempUser._id);
-    org.save()
+    return org.save()
       .then(org => {
         this.tempOrg = org;
         done();
@@ -75,7 +76,7 @@ describe('Task Routes', function() {
     let project = new Project(exampleProject);
     project.orgId = this.tempOrg._id;
     project.admins.push(this.tempUser._id);
-    project.save()
+    return project.save()
       .then(project => {
         this.tempProject = project;
         done();
@@ -94,23 +95,50 @@ describe('Task Routes', function() {
       });
   });
 
-  describe('POST /api/project/:projectId/task', () => {
+  afterEach( done => {
+    Promise.all([
+      User.remove({}),
+      Org.remove({}),
+      Project.remove({}),
+      Task.remove({}),
+    ]).then( () => done())
+      .catch(done);
+  });
+
+  describe('POST: /api/project/:projectId/task', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        expect(res.status).toEqual(200);
-        expect(res.body.projectId).toEqual(this.tempProject._id.toString());
-        expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
-        expect(res.body.admins).toEqual(expect.arrayContaining([this.tempUser._id]));
-        expect(res.body.expectedDuration).toEqual(exampleTask.expectedDuration);
-        expect(res.body.status).toEqual(exampleTask.status);
-        done();
+        superagent.post(`${url}/api/project/${this.tempProject._id}/task`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .send(exampleTask)
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.projectId).toEqual(this.tempProject._id.toString());
+            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
+            expect(res.body.admins).toEqual(expect.arrayContaining([this.tempUser._id.toString()]));
+            expect(res.body.expectedDuration).toEqual(exampleTask.expectedDuration);
+            expect(res.body.status).toEqual(exampleTask.status);
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
       it('should respond with a 400 if the request body is invalid', done => {
-        // TODO: add test
-        done();
+        superagent.post(`${url}/api/project/${this.tempProject._id}/task`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .send({ key: 'value'})
+          .end((err, res) => {
+            expect(err.status).toEqual(400);
+            expect(res.status).toEqual(400);
+            expect(err.message).toEqual('Bad Request');
+            done();
+          });
       });
     });
   });
@@ -118,25 +146,57 @@ describe('Task Routes', function() {
   describe('GET /api/task/:taskId', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        // TODO: add test
-        done();
+        superagent.get(`${url}/api/task/${this.tempTask._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.projectId).toEqual(this.tempProject._id.toString());
+            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
+            expect(res.body.admins).toEqual(expect.arrayContaining([this.tempUser._id.toString()]));
+            expect(res.body.desc).toEqual(exampleTask.desc);
+            done();
+          });
       });
     });
 
     describe('with invalid usage', () => {
-      it('should respond with a 404 for an ID that is not found', () => {
-        // TODO: add test
-        done();
+      it('should respond with a 404 for an ID that is not found', done => {
+        superagent.get(`${url}/api/task/123`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(err.status).toEqual(404);
+            expect(res.status).toEqual(404);
+            expect(err.message).toEqual('Not Found');
+            done();
+          });
       });
 
       it('should respond with a 400 if no ID is provided', done => {
-        // TODO: add test
-        done();
+        superagent.get(`${url}/api/task/`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(err.status).toEqual(400);
+            expect(res.status).toEqual(400);
+            expect(err.message).toEqual('Bad Request');
+            done();
+          });
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        // TODO: add test
-        done();
+        superagent.get(`${url}/api/task/${this.tempTask._id}`)
+          .end((err, res) => {
+            expect(err.status).toEqual(401);
+            expect(res.status).toEqual(401);
+            expect(err.message).toEqual('Unauthorized');
+            done();
+          });
       });  
     });
   });
@@ -144,25 +204,61 @@ describe('Task Routes', function() {
   describe('PUT /api/task/:taskId', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        // TODO: add test
-        done();
+        superagent.put(`${url}/api/task/${this.tempTask._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .send({ desc: 'newDesc'})
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.desc).toEqual('newDesc');
+            expect(res.body._id).toEqual(this.tempTask._id.toString());
+            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
+            expect(res.body.projectId).toEqual(this.tempProject._id.toString());
+            done();
+          });
       });
     });
 
     describe('with INVALID usage', () => {
-      it('should respond with a 404 for an ID that is not found', () => {
-        // TODO: add test
-        done();
+      it('should respond with a 404 for an ID that is not found', done => {
+        superagent.put(`${url}/api/task/123`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .send({ desc: 'newDesc'})
+          .end((err, res) => {
+            expect(err.status).toEqual(404);
+            expect(res.status).toEqual(404);
+            expect(err.message).toEqual('Not Found');
+            done();
+          });
       });
 
       it('should respond with a 400 if no ID is provided', done => {
-        // TODO: add test
-        done();
+        superagent.put(`${url}/api/task/`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .send({ desc: 'newDesc'})
+          .end((err, res) => {
+            expect(err.status).toEqual(400);
+            expect(res.status).toEqual(400);
+            expect(err.message).toEqual('Bad Request');
+            done();
+          });
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        // TODO: add test
-        done();
+        superagent.put(`${url}/api/task/${this.tempTask._id}`)
+          .send({ desc: 'newDesc'})
+          .end((err, res) => {
+            expect(err.status).toEqual(401);
+            expect(res.status).toEqual(401);
+            expect(err.message).toEqual('Unauthorized');
+            done();
+          });
       });  
     });
   });
@@ -170,8 +266,16 @@ describe('Task Routes', function() {
   describe('DELETE /api/task/:taskId', () => {
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        // TODO: add test
-        done();
+        console.log('this.tempTask', this.tempTask);
+        superagent.delete(`${url}/api/task/${this.tempTask._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(204);
+            done();
+          });
       });
     });
   });
