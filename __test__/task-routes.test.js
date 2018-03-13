@@ -1,7 +1,6 @@
 'use strict';
 
 const superagent = require('superagent');
-const debug = require('debug')('promgmt:task-routes.test');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
 const User = require('../model/user.js');
