@@ -42,3 +42,13 @@ Project.findByIdAndAddTask = function(id, task, userId){
     }).then(() => this.tempTask)
     .catch(err => Promise.reject(createError(400, err.message)));
 };
+
+Project.findByIdAndRemoveTask = function(projectId){
+  Project.findById(projectId)
+    // .populate('tasks')
+    .then( project => {
+      this.tempRemoveProject = project;
+      console.log('this.tempRemoveProject', this.tempRemoveProject);
+      console.log('this.tempProject.tasks[0]', this.tempRemoveProject.tasks[0]);
+    });
+};

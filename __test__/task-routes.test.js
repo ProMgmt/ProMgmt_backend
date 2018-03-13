@@ -46,7 +46,7 @@ describe('Task Routes', function() {
   });
 
   afterAll( done => {
-    serverToggle.serverOn(server, done);
+    serverToggle.serverOff(server, done);
   });
 
   beforeEach( done => {
@@ -91,6 +91,43 @@ describe('Task Routes', function() {
     task.save()
       .then(task => {
         this.tempTask = task;
+        this.tempProject.tasks.push(task._id);
+        done();
+      });
+  });
+
+  beforeEach( done => {
+    let task = new Task(exampleTask);
+    task.projectId = this.tempProject._id;
+    task.orgId = this.tempOrg._id;
+    task.admins.push(this.tempUser._id);
+    task.subTasks.push(this.tempTask._id);
+    task.save()
+      .then(task => {
+        this.tempTask1 = task;
+        this.tempProject.tasks.push(task._id);
+        done();
+      });
+  });
+
+  beforeEach( done => {
+    let task = new Task(exampleTask);
+    task.projectId = this.tempProject._id;
+    task.orgId = this.tempOrg._id;
+    task.admins.push(this.tempUser._id);
+    task.dependentTasks.push(this.tempTask1._id);
+    task.save()
+      .then(task => {
+        this.tempTask2 = task;
+        this.tempProject.tasks.push(task._id);
+        done();
+      });
+  });
+
+  beforeEach( done => {
+    this.tempProject.save()
+      .then( project => {
+        this.tempProject = project;
         done();
       });
   });
@@ -266,7 +303,6 @@ describe('Task Routes', function() {
   describe('DELETE /api/task/:taskId', () => {
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        console.log('this.tempTask', this.tempTask);
         superagent.delete(`${url}/api/task/${this.tempTask._id}`)
           .set({
             Authorization: `Bearer ${this.tempToken}`,
