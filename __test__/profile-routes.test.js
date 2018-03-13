@@ -142,7 +142,6 @@ describe('Profile Routes', function () {
           })
           .end((err, res) => {
             expect(res.status).toEqual(404);
-
             done();
           });
       });

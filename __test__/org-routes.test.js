@@ -105,11 +105,7 @@ describe('Org Routes', function() {
             expect(err.message).toEqual('Not Found');
             done();
           });
-        
       });
-
-      
-        
 
       it('should respond with a 401 if no token was provided', done => {
         superagent.get(`${url}/api/org/${hooks.tempOrg}`)
