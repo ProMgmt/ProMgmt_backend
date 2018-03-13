@@ -17,7 +17,7 @@ taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function
 
   Project.findByIdAndAddTask(req.params.projectId, req.body, req.user._id)
     .then( task => res.json(task))
-    .catch(err => next(err));
+    .catch(next);
 });
 
 taskRouter.get('/api/task/:taskId', bearerAuth, function(req, res, next) {

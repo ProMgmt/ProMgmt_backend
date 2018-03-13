@@ -82,6 +82,18 @@ describe('Profile Routes', function () {
             done();
           });
       });
+
+      it('should return a 404 if userId does not exist', done => {
+        superagent.post(`${url}/api/user/5aaaaaaaaf1ce7aaaa93f5aa/profile`)
+          .send(hooks.exampleProfile)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
+      });
     });
   });
 

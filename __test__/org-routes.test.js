@@ -111,7 +111,7 @@ describe('Org Routes', function() {
       it('should respond with a 401 if no token was provided', done => {
         superagent.get(`${url}/api/org/${hooks.tempOrg._id}`)
           .set({
-            Authorization: ``,
+            Authorization: `Bearer `,
           })
           .end((err, res) => {
             expect(res.status).toEqual(401);
@@ -119,6 +119,17 @@ describe('Org Routes', function() {
             done();
           });
       });  
+
+      it('should respond with a 400 if no ID was provided', done => {
+        superagent.get(`${url}/api/org`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
     });
   });
 

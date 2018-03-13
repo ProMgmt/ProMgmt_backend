@@ -15,18 +15,15 @@ const profileRouter = module.exports = Router();
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
 
-  req.body.userId = req.user._id;
+  req.body.userId = req.params.userId;
 
-
-  User.findById(req.body.userId)
+  User.findById(req.params.userId)
     .then(user => {
-      if (!user) next(createError(404, 'user not found'));
-      return;
+      if (!user) return next(createError(404, 'user not found'));
     })
     .then(() => new Profile(req.body).save())
     .then(profile => res.json(profile))
     .catch(err => next(err));
-
 });
 
 //GET ROUTE
@@ -47,7 +44,6 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, nex
 profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function (req, res, next) {
   debug('PUT: /api/profile/profileId');
 
-
   if (req.body.firstName === undefined && req.body.lastName === undefined && req.body.desc === undefined && req.body.title === undefined && req.body.company === undefined && req.body.avatarURI === undefined)     return next(createError(400, 'request body not provided'));
 
   Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
@@ -64,7 +60,6 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function (req, res, 
   debug('DELETE: /api/profile/profileId');
 
   Profile.findByIdAndRemove(req.params.profileId)
-
     .then(() => {
       return res.sendStatus(204, 'profile deleted');
     })
