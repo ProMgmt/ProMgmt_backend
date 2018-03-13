@@ -272,7 +272,7 @@ describe('Profile Routes', function() {
       });
 
       //not passing
-      it('should respond with a 400 if no request body provided', done => {
+      it.only('should respond with a 400 if no request body provided', done => {
         superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`

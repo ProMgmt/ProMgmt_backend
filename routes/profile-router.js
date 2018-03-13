@@ -56,7 +56,7 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
   debug('PUT: /api/profile/profileId');
 
   if(!req.params.profileId) {
-    res.status(400).send();
+    res.status(404).send();
   }
 
   if(req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
@@ -67,6 +67,8 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
         if(err.name === 'ValidationError') return next(err);
         next(createError(404, err.message));
       });
+  } else {
+    return next(createError(400, 'request body not provided'))
   }
 });
 
