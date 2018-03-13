@@ -178,7 +178,6 @@ describe('Profile Routes', function() {
       });
     });
 
-    //not passing. saying done not defined??
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/profile/`)
@@ -243,7 +242,6 @@ describe('Profile Routes', function() {
       });
 
 
-    //not passing "can't set headers"
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         console.log(this.tempProfile)
