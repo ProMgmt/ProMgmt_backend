@@ -27,7 +27,7 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
     })
     .then( profile => res.json(profile))
     .catch( err => {
-      return next(createError(400, 'no request body provided'));
+      return next(createError(400, err));
     });
 });
 
