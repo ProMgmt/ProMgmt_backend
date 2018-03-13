@@ -30,8 +30,8 @@ function s3uploadProm(params) {
   });
 }
 
-profilePicRouter.post('/api/profile/:profileId', bearerAuth, upload.single('image'), function(req, res, next) {
-  debug('POST: /api/profile/profileId');
+profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('image'), function(req, res, next) {
+  debug('POST: /api/profile/profileId/pic');
 
   if(!req.file.path) {
     return next(createError(400, 'file not found'));
