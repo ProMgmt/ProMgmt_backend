@@ -80,9 +80,9 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if(err) return done(err);
           expect(res.status).toEqual(200);
-          expect(res.body.desc).toEqual(exampleProfile.desc);
-          expect(res.body.firstName).toEqual(exampleProfile.firstName);
-          expect(res.body.lastName).toEqual(exampleProfile.lastName);
+          expect(res.body.desc).toEqual(exampleProfile.desc.toString());
+          expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
+          expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
           done();
         });
       });
@@ -166,6 +166,7 @@ describe('Profile Routes', function() {
 
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
+        console.log(this.tempProfile._id)
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -173,6 +174,9 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).toEqual(200);
+          expect(res.body.desc).toEqual(exampleProfile.desc.toString());
+          expect(res.body.firstName).toEqual(exampleProfile.firstName.toString());
+          expect(res.body.lastName).toEqual(exampleProfile.lastName.toString());
           done();
         })
       });
@@ -349,9 +353,8 @@ describe('Profile Routes', function() {
       });
     });
 
-    //not passing
     describe('with INVALID usage', () => {
-      it.only('should return a 404 if an invalid id provided', done => {
+      it('should return a 404 if an invalid id provided', done => {
         superagent.delete(`${url}/api/profile/789`)
         .set({
           Authorization: `Bearer ${this.tempToken}`

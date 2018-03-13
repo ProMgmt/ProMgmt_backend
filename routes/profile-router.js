@@ -22,16 +22,13 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
   }
 
   User.findById(req.body.userId)
-  .then( user => {
-    res.json(user);
+  .then( () => {
+    return new Profile(req.body).save()
   })
+  .then( profile => res.json(profile))
   .catch( err => {
-    return next(createError(404, 'user id not found'))
+    return next(createError(400, 'no request body provided'))
   })
-
-  new Profile(req.body).save()
-    .then( profile => res.json(profile))
-    .catch(next);
 });
 
 //GET ROUTE
@@ -43,11 +40,11 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
     return next(createError(404, 'profile id not found'));
   }
 
-  Profile.findById(req.body.profileId)
+  Profile.findById(req.params.profileId)
     .then( profile => {
-      if(!profile) return next(createError(404, 'profile id not found'))
+      return res.json(profile)
     })
-    .catch(done);
+    .catch( err => next(createError(404, 'invalid profile id')));
 });
 
 //PUT ROUTE
