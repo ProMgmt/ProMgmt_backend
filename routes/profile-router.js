@@ -40,12 +40,12 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
   debug('GET: /api/profile/profileId');
 
   if(!req.params.profileId) {
-    return next(createError(404, 'no profile id provided'));
+    return next(createError(404, 'profile id not found'));
   }
 
   Profile.findById(req.body.profileId)
     .then( profile => {
-      if(!profile) return next(createError(404, 'id not found'))
+      if(!profile) return next(createError(404, 'profile id not found'))
     })
     .catch(done);
 });

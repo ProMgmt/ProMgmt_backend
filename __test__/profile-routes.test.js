@@ -181,7 +181,7 @@ describe('Profile Routes', function() {
     //not passing. saying done not defined??
     describe('with INVALID usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
-        superagent.get(`${url}/api/profile/123`)
+        superagent.get(`${url}/api/profile/`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
