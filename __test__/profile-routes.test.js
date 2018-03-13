@@ -271,8 +271,7 @@ describe('Profile Routes', function() {
         })
       });
 
-      //not passing
-      it.only('should respond with a 400 if no request body provided', done => {
+      it('should respond with a 400 if no request body provided', done => {
         superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -335,7 +334,6 @@ describe('Profile Routes', function() {
           .catch(done);
       });
 
-    //not passing. 
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
         console.log('pro id:', this.tempProfile._id)
