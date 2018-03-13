@@ -68,3 +68,5 @@ profilePicRouter.post('/api/profile/:profileId', bearerAuth, upload.single('imag
     .then( pic => res.json(pic))
     .catch( err => next(err));
 });
+
+
