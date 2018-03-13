@@ -17,7 +17,7 @@ describe('Profile Routes', function() {
   });
 
   afterAll( done => {
-    serverToggle.serverOn(server, done);
+    serverToggle.serverOff(server, done);
   });
 
   describe('POST /api/user/:userId/profile', () => {
