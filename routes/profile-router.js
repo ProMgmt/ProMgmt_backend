@@ -40,7 +40,7 @@ profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next
   debug('GET: /api/profile/profileId');
 
   if(!req.params.profileId) {
-    return next(createError(400, 'profile id requried'))
+    return next(createError(400, 'no profile id provided'));
   }
 
   Profile.findById(req.params.profileId)
@@ -58,6 +58,8 @@ profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(re
   if(!req.body.profileId) {
     res.status(404).send();
   }
+
+
 
   if(req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
 

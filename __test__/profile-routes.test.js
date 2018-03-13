@@ -23,6 +23,12 @@ const exampleProfile = {
   desc: 'example description',
 }
 
+const exEditedProfile = {
+  firstName: 'edited first name',
+  lastName: 'edited last name',
+  desc: 'edited description',
+}
+
 describe('Profile Routes', function() {
   beforeAll( done => {
     serverToggle.serverOn(server, done);
@@ -174,6 +180,7 @@ describe('Profile Routes', function() {
       });
     });
 
+    //not passing. saying done not defined??
     describe('with invalid usage', () => {
       it('should respond with a 404 for an ID that is not found', done => {
         superagent.get(`${url}/api/profile/123`)
@@ -185,7 +192,9 @@ describe('Profile Routes', function() {
           done();
         });
       });
+      
 
+      //not passing. 400 and 404 are switched
       it('should respond with a 400 if no ID is provided', done => {
         superagent.get(`${url}/api/profile/`)
         .set({
@@ -194,10 +203,10 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           expect(res.status).toEqual(400);
           done();
-        })
+        });
       });
 
-      it.only('should respond with a 401 if no token was provided', done => {
+      it('should respond with a 401 if no token was provided', done => {
         superagent.get(`${url}/api/profile/${this.tempProfile._id}`)
         .end((err, res) => {
           expect(res.status).toEqual(401);
@@ -211,27 +220,93 @@ describe('Profile Routes', function() {
   // PUT ROUTE TESTS
 
   describe('PUT /api/profile/:profileId', () => {
+    beforeEach( done => {
+      let user = new User(exampleUser)
+      user.generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken()
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+    });
+
+    beforeEach( done => {
+      exampleProfile.userId = this.tempUser._id;
+      new Profile(exampleProfile).save()
+        .then( profile => {
+          this.tempProfile = profile;
+          done();
+        })
+        .catch(done)
+      });
+
+      afterEach( done => {
+        User.remove({})
+          .then( () => done()) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL USERS
+          .catch(done);
+      });
+  
+      afterEach( done => {
+        Profile.remove({}) //NEEDS TO BE CHANGED WHEN WE START INSTANTIATING REAL PROFILES
+          .then( () => done())
+          .catch(done);
+      });
+
+
+    //not passing "can't set headers"
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        // TODO: add test
-        done();
+        console.log(this.tempProfile)
+        superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
+        .send(exEditedProfile)
+        .set({ 
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          expect(res.status).toEqual(200);
+          done();
+        });
       });
     });
 
     describe('with INVALID usage', () => {
-      it('should respond with a 404 for an ID that is not found', () => {
-        // TODO: add test
-        done();
+      it('should respond with a 404 for an ID that is not found', done => {
+        superagent.put(`${url}/api/profile/456`)
+        .send(exEditedProfile)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(404);
+          done();
+        })
       });
 
-      it('should respond with a 400 if no ID is provided', done => {
-        // TODO: add test
-        done();
+      it.only('should respond with a 400 if no ID is provided', done => {
+        superagent.put(`${url}/api/profile/`)
+        .send(exEditedProfile)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(400);
+          done();
+        });
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        // TODO: add test
-        done();
+        superagent.put(`${url}/api/profile/${this.tempProfile._id}`)
+        .send(exEditedProfile)
+        .end((err, res) => {
+          expect(res.status).toEqual(401);
+          done();
+        })
       });  
     });
   });
