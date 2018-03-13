@@ -4,27 +4,11 @@ const superagent = require('superagent');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
 const hooks = require('../lib/test-hooks.js');
-const User = require('../model/user.js');
-const Project = require('../model/project.js');
-const Org = require('../model/org.js');
 const PORT = process.env.PORT || 3000;
 
 require('jest');
 
 const url = `http://localhost:${PORT}`;
-
-const exampleOrg = {
-  name: 'example organization',
-  desc: 'this is my description',
-};
-
-const exampleProject = {
-  projectName: 'example project name',
-};
-
-const manuallySavedProject = {
-  projectName: 'project for get put and delete route tests',
-};
 
 describe('Project Routes', function() {
   beforeAll( done => {
@@ -36,72 +20,40 @@ describe('Project Routes', function() {
   });
 
   beforeEach( done => {
-    new User(hooks.exampleUser)
-      .generatePasswordHash(hooks.exampleUser.password)
-      .then(user => user.save())
-      .then(user => {
-        this.tempUser = user;
-        return user.generateToken();
-      })
-      .then(token => {
-        hooks.tempToken = token;
-        done();
-      })
-      .catch(done);
+    hooks.createUser(done);
   });
 
   beforeEach( done => {
-    exampleOrg.admin = this.tempUser._id.toString();
-
-    new Org(exampleOrg).save()
-      .then( org => {
-        this.tempOrg = org;
-        done();
-      })
-      .catch(done);
+    hooks.createOrg(done);
   });
 
   beforeEach( done => {
-    manuallySavedProject.orgId = this.tempOrg._id.toString();
-    manuallySavedProject.admins = this.tempUser._id.toString();
-
-    new Project(manuallySavedProject).save()
-      .then(project => {
-        this.tempProject = project;
-        done();
-      })
-      .catch(done);
+    hooks.createProject(done);
   });
 
   afterEach( done => {
-    delete exampleOrg.admin;
+    delete hooks.exampleOrg.admin;
     done();
   });
 
   afterEach( done => {
-    Promise.all([
-      User.remove({}),
-      Org.remove({}),
-      Project.remove({}),
-    ])
-      .then(() => done())
-      .catch(done);
+    hooks.removeDBInfo(done);
   });
 
   describe('POST /api/org/:orgId/project', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        superagent.post(`${url}/api/org/${this.tempOrg._id}/project`)
-          .send(exampleProject)
+        superagent.post(`${url}/api/org/${hooks.tempOrg._id}/project`)
+          .send(hooks.exampleProject)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if (err) return done(err);
             expect(res.status).toEqual(200);
-            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
-            expect(res.body.admins).toContain(this.tempUser._id.toString());
-            expect(res.body.projectName).toEqual(exampleProject.projectName);
+            expect(res.body.orgId).toEqual(hooks.tempOrg._id.toString());
+            expect(res.body.admins).toContain(hooks.tempUser._id.toString());
+            expect(res.body.projectName).toEqual(hooks.exampleProject.projectName);
             done();
           });
       });
@@ -109,7 +61,7 @@ describe('Project Routes', function() {
 
     describe('with INVALID usage', () => {
       it('should respond with a 400 if the request body is invalid', done => {
-        superagent.post(`${url}/api/org/${this.tempOrg._id}/project`)
+        superagent.post(`${url}/api/org/${hooks.tempOrg._id}/project`)
           .send({ desc: 'wooo' })
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
@@ -122,8 +74,8 @@ describe('Project Routes', function() {
       });
 
       it('should respond with a 401 if the user is not authorized', done => {
-        superagent.post(`${url}/api/org/${this.tempOrg._id}/project`)
-          .send(exampleProject)
+        superagent.post(`${url}/api/org/${hooks.tempOrg._id}/project`)
+          .send(hooks.exampleProject)
           .end((err, res) => {
             expect(res.status).toEqual(401);
             expect(res.text).toEqual('UnauthorizedError');
@@ -136,15 +88,15 @@ describe('Project Routes', function() {
   describe('GET /api/project/:projectId', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        superagent.get(`${url}/api/project/${this.tempProject._id}`)
+        superagent.get(`${url}/api/project/${hooks.tempProject._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if (err) return done(err);
             expect(res.status).toEqual(200);
-            expect(res.body.projectName).toEqual(this.tempProject.projectName);
-            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
+            expect(res.body.projectName).toEqual(hooks.tempProject.projectName);
+            expect(res.body.orgId).toEqual(hooks.tempOrg._id.toString());
             done();
           });
       });
@@ -175,7 +127,7 @@ describe('Project Routes', function() {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        superagent.get(`${url}/api/project/${this.tempProject._id}`)
+        superagent.get(`${url}/api/project/${hooks.tempProject._id}`)
           .end((err, res) => {
             expect(res.status).toEqual(401);
             expect(res.text).toEqual('UnauthorizedError');
@@ -188,7 +140,7 @@ describe('Project Routes', function() {
   describe('PUT /api/project/:projectId', () => {
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        superagent.put(`${url}/api/project/${this.tempProject._id}`)
+        superagent.put(`${url}/api/project/${hooks.tempProject._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
@@ -197,7 +149,7 @@ describe('Project Routes', function() {
             if (err) return done(err);
             expect(res.status).toEqual(200);
             expect(res.body.projectName).toEqual('weeee');
-            expect(res.body.orgId).toEqual(this.tempOrg._id.toString());
+            expect(res.body.orgId).toEqual(hooks.tempOrg._id.toString());
             done();
           });
       });
@@ -231,7 +183,7 @@ describe('Project Routes', function() {
       });
 
       it('should respond with a 401 if no token was provided', done => {
-        superagent.put(`${url}/api/project/${this.tempProject._id}`)
+        superagent.put(`${url}/api/project/${hooks.tempProject._id}`)
           .send({ projectName: 'no TOKEN provided test' })
           .end((err, res) => {
             expect(res.status).toEqual(401);
@@ -245,7 +197,7 @@ describe('Project Routes', function() {
   describe('DELETE /api/project/:projectId', () => {
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        superagent.delete(`${url}/api/project/${this.tempProject._id}`)
+        superagent.delete(`${url}/api/project/${hooks.tempProject._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })

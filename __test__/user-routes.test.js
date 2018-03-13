@@ -3,18 +3,12 @@
 const superagent = require('superagent');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
-const User = require('../model/user.js');
+const hooks = require('../lib/test-hooks.js');
 const PORT = process.env.PORT || 3000;
 
 require('jest');
 
 const url = `http://localhost:${PORT}`;
-
-const exampleUser = {
-  username: 'exampleuser',
-  password: 'password!',
-  email: 'exampleemail@aol.com',
-};
 
 describe('User Routes', function() {
   beforeAll( done => {
@@ -28,15 +22,13 @@ describe('User Routes', function() {
 
   describe('POST /api/signup', () => {
     afterAll( done => {
-      User.remove({})
-        .then( () => done() )
-        .catch(done);
+      hooks.removeDBInfo(done);
     });
 
     describe('with VALID usage', () => {
       it('should add a user to the database', done => {
         superagent.post(`${url}/api/signup`)
-          .send(exampleUser)
+          .send(hooks.exampleUser)
           .end((err, res) => {
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
@@ -58,7 +50,7 @@ describe('User Routes', function() {
 
       it('should respond with a 400 if the username is already taken', done => {
         superagent.post(`${url}/api/signup`)
-          .send(exampleUser)
+          .send(hooks.exampleUser)
           .end((err, res) => {
             expect(res.status).toEqual(409);
             expect(res.text).toEqual('ConflictError');
@@ -71,30 +63,17 @@ describe('User Routes', function() {
 
   describe('GET /api/signin', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save() )
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
 
     afterEach( done => {
-      User.remove({})
-        .then( () => done())
-        .catch(done);
+      hooks.removeDBInfo(done);
     });
 
     describe('with VALID usage', () => {
       it('should return a token', done => {
         superagent.get(`${url}/api/signin`)
-          .auth(`${exampleUser.username}`, `${exampleUser.password}`)
+          .auth(`${hooks.exampleUser.username}`, `${hooks.exampleUser.password}`)
           .end((err, res) => {
             if (err) return done(err);
             expect(res.status).toEqual(200);
@@ -107,7 +86,7 @@ describe('User Routes', function() {
     describe('with INVALID usage', () => {
       it('should return a 404 if the username does not exist', done => {
         superagent.get(`${url}/api/signin`)
-          .auth('someRandomUsername', `${exampleUser.password}`)
+          .auth('someRandomUsername', `${hooks.exampleUser.password}`)
           .end((err, res) => {
             expect(res.status).toEqual(404);
             expect(res.text).toEqual('NotFoundError');
@@ -117,7 +96,7 @@ describe('User Routes', function() {
 
       it('should return a 401 if the password is incorrect', done => {
         superagent.get(`${url}/api/signin`)
-          .auth(`${exampleUser.username}`, `9871`)
+          .auth(`${hooks.exampleUser.username}`, `9871`)
           .end((err, res) => {
             expect(res.status).toEqual(401);
             expect(res.text).toEqual('UnauthorizedError');
@@ -129,24 +108,13 @@ describe('User Routes', function() {
 
   describe('DELETE /api/signin', () => {
     beforeEach( done => {
-      new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save() )
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
+      hooks.createUser(done);
     });
 
     it('should return a 204 when the user has been deleted', done => {
-      superagent.delete(`${url}/api/user/${this.tempUser._id}`)
+      superagent.delete(`${url}/api/user/${hooks.tempUser._id}`)
         .set({
-          Authorization: `Bearer ${this.tempToken}`,
+          Authorization: `Bearer ${hooks.tempToken}`,
         })
         .end((err, res) => {
           if (err) return done (err);
@@ -154,11 +122,5 @@ describe('User Routes', function() {
           done();
         });
     });
-  });
-});
-
-describe('test for travis', function() {
-  it('should pass to travis', function() {
-    expect(true).toEqual(true);
   });
 });

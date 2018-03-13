@@ -7,8 +7,10 @@
     "lib": "lib"
   },
   "scripts": {
+
     "coverage": "DEBUG='promgmt*' jest -i --coverage",
     "test": "DEBUG='promgmt*' jest -i --coverage  && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+
     "start": "DEBUG='promgmt*' node server.js"
   },
   "repository": {

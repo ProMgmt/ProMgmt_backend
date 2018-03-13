@@ -3,8 +3,6 @@
 const superagent = require('superagent');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
-const User = require('../model/user.js');
-const Profile = require('../model/profile.js');
 const PORT = process.env.PORT || 3000;
 
 require('jest');
