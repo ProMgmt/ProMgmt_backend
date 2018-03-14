@@ -13,8 +13,6 @@ const profileSchema = Schema({
   createdDate: {type: Date, required: true, default: Date.now},
   company: {type: String},
   title: {type: String},
-  avatarURI: {type: String, unique: true},
-  avatarObjectKey: {type: String, unique: true},
 });
 
 module.exports = mongoose.model('profile', profileSchema);

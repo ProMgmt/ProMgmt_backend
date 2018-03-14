@@ -45,8 +45,11 @@ taskRouter.put('/api/task/:taskId', bearerAuth, jsonParser, function(req, res, n
 taskRouter.delete('/api/task/:taskId', bearerAuth, function(req, res, next) {
   debug('DELETE: api/task/taskId');
 
+  var tempTask = {};
+
   Task.findById(req.params.taskId)
     .then( task => {
+      tempTask = task;
       return Task.find({ projectId: task.projectId });
     })
     .then( tasks => {
@@ -58,6 +61,13 @@ taskRouter.delete('/api/task/:taskId', bearerAuth, function(req, res, next) {
         if(subIndex !== -1 || depIndex !== -1) task.save();
       });
     })
+    .then( () => Project.findById(tempTask.projectId))
+    .then( project => {
+      let index = project.tasks.indexOf(req.params.taskId);
+      project.tasks.splice(index,1);
+      project.save();
+    })
+    .then( () => Task.findByIdAndRemove(req.params.taskId))
     .then( () => res.sendStatus(204))
     .catch(next);
 });
