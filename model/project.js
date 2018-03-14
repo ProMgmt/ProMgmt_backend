@@ -25,7 +25,7 @@ Project.findByIdAndAddTask = function(id, task, userId){
   return Project.findById(id)
     .then( project => {
       if(!project) return createError(404);
-      console.log('project', project);
+      
       task.projectId = project._id;
       task.orgId = project.orgId;
       task.admins = [];
