@@ -23,7 +23,7 @@ const upload = multer({dest: dataDir});
 function s3uploadProm(params){
   debug('s3uploadProm');
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     s3.upload(params, (err, s3data) => {
       resolve(s3data);
     });
@@ -33,7 +33,7 @@ function s3uploadProm(params){
 function s3deleteProm(params){
   debug('s3deleteProm');
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     s3.deleteObject(params, (err, s3res) => {
       resolve(s3res);
     });
@@ -43,9 +43,9 @@ function s3deleteProm(params){
 attachRouter.post('/api/task/:taskId/attach', bearerAuth, upload.single('attach'), function(req, res, next){
   debug('POST: /api/task/:taskId/attach');
 
-  if(!req.file) return next(createError(400, 'file not found'));
-  if(!req.file.path) return next(createError(500, 'file not saved'));
-
+  if (!req.file) return next(createError(400, 'file not found'));
+  if (req.body.name === undefined || req.body.type === undefined) return next(createError(400, 'must supply a name and a type'));
+  
   let ext = path.extname(req.file.originalname);
 
   let params = {
@@ -59,6 +59,7 @@ attachRouter.post('/api/task/:taskId/attach', bearerAuth, upload.single('attach'
 
   Task.findById(req.params.taskId)
     .then( task => {
+      if (!task) return next(createError(404));
       tempTask = task;
       return s3uploadProm(params);
     })
@@ -85,8 +86,6 @@ attachRouter.post('/api/task/:taskId/attach', bearerAuth, upload.single('attach'
 attachRouter.delete('/api/attach/:attachId', bearerAuth, function(req, res, next){
   debug('DELETE: /api/attach/:attachId');
 
-  if(!req.params.attachId) return next(createError(400, 'bad request'));
-
   let params = {
     Bucket: process.env.AWS_BUCKET,
     Key: '',
@@ -94,9 +93,16 @@ attachRouter.delete('/api/attach/:attachId', bearerAuth, function(req, res, next
 
   Attach.findById(req.params.attachId)
     .then( attach => {
+      if (!attach) return next(createError(404, 'attachment not found'));
       params.Key = attach.objectKey;
       return s3deleteProm(params);
     })
     .then( () => res.sendStatus(204))
-    .catch( err => next(err));
+    .catch(next);
+});
+
+attachRouter.all('/api/attach', function(req, res, next) {
+  debug('ALL: /api/attach/');
+
+  return next(createError(400, 'no task ID provided'));
 });
