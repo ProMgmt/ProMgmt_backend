@@ -107,7 +107,7 @@ describe('Profile Routes', function () {
 
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        console.log(hooks.tempProfile._id);
+        
         superagent.get(`${url}/api/profile/${hooks.tempProfile._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
@@ -167,7 +167,7 @@ describe('Profile Routes', function () {
   
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
-        console.log(hooks.tempProfile);
+       
         superagent.put(`${url}/api/profile/${hooks.tempProfile._id}`)
           .send(hooks.updatedProfile)
           .set({
@@ -226,7 +226,7 @@ describe('Profile Routes', function () {
 
     describe('with VALID usage', () => {
       it('should return a 204 when item has been deleted', done => {
-        console.log('pro id:', hooks.tempProfile._id);
+        
         superagent.delete(`${url}/api/profile/${hooks.tempProfile._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
