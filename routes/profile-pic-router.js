@@ -44,7 +44,7 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
   let ext = path.extname(req.file.originalname);
 
   let params = {
-    ACL: 'public read', 
+    ACL: 'public-read', 
     Bucket: process.env.AWS_BUCKET, 
     Key: `${req.file.filename}${ext}`,
     Body: fs.createReadStream(req.file.path),
@@ -53,7 +53,6 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
   Profile.findById(req.params.profileId)
     .then( () => s3uploadProm(params))
     .then( s3data => {
-      console.log('s3 res:', s3data);
       del([`${dataDir}/*`]);
 
       let picData = {

@@ -1,6 +1,8 @@
 'use strict';
 
 const superagent = require('superagent');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'), {suffix: 'Prom'});
 const debug = require('debug')('promgmt:profile-pic-router-test');
 const server = require('../server.js');
 const serverToggle = require('../lib/toggle.js');
@@ -68,7 +70,7 @@ describe('Profile Picture Routes', function() {
     });
     
     beforeEach( done => {
-      exampleProfile.userId = this.tempUser._id.toString();
+      exampleProfile.userId = this.tempUser._id;
       new Profile(exampleProfile).save()
         .then( profile => {
           this.tempProfile = profile;
@@ -76,7 +78,15 @@ describe('Profile Picture Routes', function() {
         })
         .catch(done);
     });
-    
+
+    this.tempProfilePic = {};
+
+    beforeEach( done => {
+      fs.copyFileProm(`${__dirname}/testdata/tester.png`, `${__dirname}/../data/tester.png`)
+        .then( () => done())
+        .catch(done);
+    });
+
     afterEach( done => {
       delete exampleProfile.userId;
       done();
@@ -120,14 +130,13 @@ describe('Profile Picture Routes', function() {
           });
       });
 
-      it.only('should return a 404 with improper profile id', done => {
-        superagent.post(`${url}/api/profile//pic`)
+      it('should return a 404 with improper profile id', done => {
+        superagent.post(`${url}/api/profile/123/pic`)
           .set({
             Authorization: `Bearer ${this.tempToken}`,
           })
           .attach('image', exampleProfilePic.image)
           .end((err, res) => {
-            console.log('res', res)
             expect(res.status).toEqual(404);
             done();
           });
