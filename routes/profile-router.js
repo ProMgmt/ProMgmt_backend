@@ -12,73 +12,63 @@ const profileRouter = module.exports = Router();
 
 //POST ROUTE
 
-profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function(req, res, next) {
+profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
 
-  req.body.userId = req.user._id;
+  req.body.userId = req.params.userId;
 
-  if(!req.params.userId) {
-    return next(createError(404, 'user id required'))
-  }
-
-  User.findById(req.body.userId)
-  .then( () => {
-    return new Profile(req.body).save()
-  })
-  .then( profile => res.json(profile))
-  .catch( err => {
-    return next(createError(400, 'no request body provided'))
-  })
+  User.findById(req.params.userId)
+    .then(user => {
+      if (!user) return next(createError(404, 'user not found'));
+    })
+    .then(() => new Profile(req.body).save())
+    .then(profile => res.json(profile))
+    .catch(err => next(err));
 });
 
 //GET ROUTE
 
-profileRouter.get('/api/profile/:profileId', bearerAuth, function(req, res, next) {
+profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, next) {
   debug('GET: /api/profile/profileId');
 
-  if(!req.params.profileId) {
-    return next(createError(404, 'profile id not found'));
-  }
-
   Profile.findById(req.params.profileId)
-    .then( profile => {
-      return res.json(profile)
+    .then(profile => {
+      if (!profile) return next(createError(404));
+      res.json(profile);
     })
-    .catch( err => next(createError(404, 'invalid profile id')));
+    .catch(next);
 });
 
 //PUT ROUTE
 
-profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function(req, res, next) {
+profileRouter.put('/api/profile/:profileId', bearerAuth, jsonParser, function (req, res, next) {
   debug('PUT: /api/profile/profileId');
 
-  if(!req.params.profileId) {
-    res.status(404).send();
-  }
+  if (req.body.firstName === undefined && req.body.lastName === undefined && req.body.desc === undefined && req.body.title === undefined && req.body.company === undefined && req.body.avatarURI === undefined)     return next(createError(400, 'request body not provided'));
 
-  if(req.body.firstName || req.body.lastName || req.body.desc || req.body.title || req.body.company || req.body.avatarURI) {
-
-    Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
-      .then( profile => res.json(profile))
-      .catch( err => {
-        if(err.name === 'ValidationError') return next(err);
-        next(createError(404, err.message));
-      });
-  } else {
-    return next(createError(400, 'request body not provided'))
-  }
+  Profile.findByIdAndUpdate(req.params.profileId, req.body, { new: true })
+    .then(profile => {
+      if (!profile) return next(createError(404));
+      return res.json(profile);
+    })
+    .catch(next);
 });
 
 //DELETE ROUTE
 
-profileRouter.delete('/api/profile/:profileId', bearerAuth, function(req, res, next) {
+profileRouter.delete('/api/profile/:profileId', bearerAuth, function (req, res, next) {
   debug('DELETE: /api/profile/profileId');
 
-  if(!req.params.profileId) {
-    res.status(404).send();
-  }
-
   Profile.findByIdAndRemove(req.params.profileId)
-    .then( () => next(createError(204, 'profile deleted')))
-    .catch( err => next(createError(404, err.message)));
+    .then(() => {
+      return res.sendStatus(204, 'profile deleted');
+    })
+    .catch(next);
 });
+
+profileRouter.all('/api/profile', function(req, res, next) {
+  debug('ALL: /api/profile');
+
+  return next(createError(400));
+});
+

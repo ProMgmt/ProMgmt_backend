@@ -25,12 +25,11 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
 orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('GET: /api/org/orgId');
 
-  if(!req.params.orgId) {
-    return next(createError(400,'Bad Request'));
-  }
-
   Org.findById(req.params.orgId)
-    .then( org => res.json(org))
+    .then( org => {
+      if (!org) return next(createError(404));
+      return res.json(org);
+    })
     .catch(next);
 });
 
@@ -53,7 +52,8 @@ orgRouter.delete('/api/org/:orgId', bearerAuth, function(req, res, next) {
     .catch(next);
 });
 
+orgRouter.all('/api/org', function(req, res, next) {
+  debug('ALL: /api/org');
 
-
-
-
+  return next(createError(400));
+});
