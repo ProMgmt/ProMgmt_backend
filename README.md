@@ -26,7 +26,7 @@ Users can create a profile, start and join orgainizations, create projects, and 
 ### Download and Testing
 
 To download and run the code, git clone our repo:
-```<git repo>```
+```<https://github.com/ProMgmt/ProMgmt_backend.git>```
 
 Download needed dependencies with ```npm i``` and run the test suites with ```npm run test```.
 
@@ -94,7 +94,7 @@ If successful, the user that created the organization will be made the admin for
     "desc": "<description>",
     "name": "<organizationName>",
     "projects": [<array of projects owned by organization>],
-    "users": [array of users belonging to organization],
+    "users": [<array of users belonging to organization>],
 }
 ```
 #### ```GET /api/org/<ordId>```
