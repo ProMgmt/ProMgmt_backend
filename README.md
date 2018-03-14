@@ -32,7 +32,7 @@ Download needed dependencies with ```npm i``` and run the test suites with ```np
 
 ### Resource Relationships
 <h1 align="center">
-  <img src="https://s3-us-west-2.amazonaws.com/cfgramdev/Project+Management+App+ERD.png" alt="Volly" width="640"></a>
+  <img src="https://s3-us-west-2.amazonaws.com/cfgramdev/Project+Management+App+ERD.png" height="400" width="auto"></a>
 </h1>
 # Routes
 
