@@ -30,8 +30,8 @@ To download and run the code, git clone our repo:
 
 Download needed dependencies with ```npm i``` and run the test suites with ```npm run test```.
 
-
 ### Resource Relationships
+
 # Routes
 
 ## User
@@ -125,7 +125,7 @@ Upon success, the user that created the project will be given admin rights, and 
     "orgId": "<organizationId>",
     "projectName": "<name of project>",
     "tasks": [<array of tasks that belong to project>],
-    "users": [array of users that belong to project],
+    "users": [<array of users that belong to project>],
 }
 ```
 
@@ -138,6 +138,8 @@ Upon success, the user that created the project will be given admin rights, and 
 ## Task
 
 #### ```POST /api/project/<projectId>/task```
+
+
 
 #### ```GET /api/task/<taskId>```
 

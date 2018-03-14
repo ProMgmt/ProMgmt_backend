@@ -8,8 +8,6 @@ const serverToggle = require('../lib/toggle.js');
 const hooks = require('../lib/test-hooks.js');
 const PORT = process.env.PORT || 3000;
 
-const Attach = require('../model/attachment.js');
-
 require('jest');
 
 const url = `http://localhost:${PORT}`;
@@ -80,3 +78,4 @@ describe('Attach Routes', function(){
     });
   });
 });
+
