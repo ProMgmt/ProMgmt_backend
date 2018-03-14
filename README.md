@@ -30,6 +30,11 @@ To download and run the code, git clone our repo:
 
 Download needed dependencies with ```npm i``` and run the test suites with ```npm run test```.
 
+### Site Map
+<h1 align="center">
+  <img src="https://s3-us-west-2.amazonaws.com/cfgramdev/ProMgmt+Site+Map.png" height="750" width="auto"></a>
+</h1>
+
 ### Resource Relationships
 <h1 align="center">
   <img src="https://s3-us-west-2.amazonaws.com/cfgramdev/Project+Management+App+ERD.png" height="750" width="auto"></a>
@@ -69,6 +74,8 @@ Once you have a have an account, you can hit this route with proper basic Auth, 
 #### ```PUT /api/user/<userId>```
 
 #### ```DELETE /api/user/<userId>```
+
+If you hit this route with a valid userId, it will delete the resource from the database, and return a 204 status.
 
 ## Profile
 
@@ -132,6 +139,8 @@ Upon success, the user that created the project will be given admin rights, and 
 }
 ```
 
+The _id of the project will also be added to the array of projects in the associated org resource.
+
 #### ```GET /api/project/<projectId>```
 
 #### ```PUT /api/project/<projectId>```
@@ -142,7 +151,25 @@ Upon success, the user that created the project will be given admin rights, and 
 
 #### ```POST /api/project/<projectId>/task```
 
+You can add tasks to a specific project at this route. The only thing sent on the back end is a JSON object witha  single key/value pair:
+```
+{
+  "desc": "<task description>",
+}
+```
 
+Upon success, you will recieve the following:
+```
+{
+    "_id": "5aa9938031e7c464df9e1f7a",
+    "admins": ["<array of userIds with admin rights>"],
+    "dependentTasks": [<array of taskIds that are dependent on this one>],
+    "desc": "<task description>",
+    "orgId": "<orgId of parent organization>",
+    "projectId": "<projectId>",
+    "subTasks": [<array of child tasks>],
+}
+```
 
 #### ```GET /api/task/<taskId>```
 
