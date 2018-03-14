@@ -132,7 +132,7 @@ describe('User Routes', function() {
 
       it('should return a 401 if no password or username in auth', done => {
         superagent.get(`${url}/api/signin`)
-          .auth({})
+          .auth(`Basic`)
           .end((err, res) => {
             expect(res.status).toEqual(401);
             done();
@@ -155,6 +155,17 @@ describe('User Routes', function() {
         .end((err, res) => {
           if (err) return done (err);
           expect(res.status).toEqual(204);
+          done();
+        });
+    });
+
+    it('should throw an error when the token is incorrect', done => {
+      superagent.delete(`${url}/api/user/${hooks.tempUser._id}`)
+        .set({
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6ImY0YTY1N2M2MTFjMWIyMzcyYzAxYmEzOWY0NDc1NjllNmQ4ZmNiYmM4NmQ4MGaaaaayMWNlZGE1NTQwMTRkYTUiLCJpYXQiOjE1MjEwNTg0MDB9.MihqcvUVMvBxNfXl-sMCiES4TVvwBQN6JUTgXpNag0I`,
+        })
+        .end((err, res) => {
+          expect(res.status).toEqual(401);
           done();
         });
     });

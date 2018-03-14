@@ -31,9 +31,7 @@ Project.findByIdAndAddTask = function(id, task, userId){
       task.admins = [];
       task.admins.push(userId.toString());
       project.admins.forEach( admin => {
-        if(!task.admins.includes(admin.toString())){
-          task.admins.push(admin);
-        }
+        if(!task.admins.includes(admin.toString())) task.admins.push(admin);
       });
       this.tempProject = project;
       return new Task(task).save();
