@@ -15,19 +15,7 @@ projectRouter.post('/api/org/:orgId/project', jsonParser, bearerAuth, function(r
 
   if(req.params.orgId === undefined || req.user._id === undefined || req.body.projectName === undefined) return next(createError(400, 'Bad Request'));
 
-  Org.findById(req.params.orgId)
-    .then( () => {  
-      let projectData = {
-        orgId: req.params.orgId,
-        admins: req.user._id,
-        projectName: req.body.projectName,
-        desc: req.body.desc,
-        startDate: req.body.startDate,
-        dueDate: req.body.dueDate,
-      };
-      
-      return new Project(projectData).save();
-    })
+  Org.findByIdAndAddProject(req.params.orgId, req.body, req.user._id)
     .then( project => res.json(project))
     .catch(next);
 });
