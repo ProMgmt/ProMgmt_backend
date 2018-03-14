@@ -31,7 +31,9 @@ To download and run the code, git clone our repo:
 Download needed dependencies with ```npm i``` and run the test suites with ```npm run test```.
 
 ### Resource Relationships
-
+<h1 align="center">
+  <img src="https://s3-us-west-2.amazonaws.com/cfgramdev/Project+Management+App+ERD.png" alt="Volly" width="640"></a>
+</h1>
 # Routes
 
 ## User
