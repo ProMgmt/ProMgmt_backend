@@ -1,4 +1,4 @@
-# ProMgmt 
+# ProMgmt [![Build Status](https://travis-ci.org/ProMgmt/ProMgmt_backend.svg?branch=master)](https://travis-ci.org/ProMgmt/ProMgmt_backend)
 
 ProMgmt is project management software that helps comapanies, organizations, and teams to define, organize, and manage projects.
 
