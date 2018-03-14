@@ -47,6 +47,9 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
   };
 
   Profile.findById(req.params.profileId)
+    .then( profile => {
+      if (!profile) return next(createError(404));
+    })
     .then( () => s3uploadProm(params))
     .then( s3data => {
       del([`${dataDir}/*`]);
@@ -61,7 +64,7 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
       return new ProfilePic(picData).save();
     })
     .then( profilePic => res.json(profilePic))
-    .catch( err => next(createError(404, err)));
+    .catch(next);
 });
 
 

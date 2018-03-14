@@ -72,7 +72,7 @@ describe('Profile Picture Routes', function() {
       });
 
       it('should return a 404 with improper profile id', done => {
-        superagent.post(`${url}/api/profile/123/pic`)
+        superagent.post(`${url}/api/profile/5aa837baaaaa3f3e1055ba95/pic`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
