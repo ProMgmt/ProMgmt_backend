@@ -37,10 +37,6 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
     return next(createError(400, 'file not found'));
   }
 
-  if(!req.file.path) {
-    return next(createError(500, 'file not saved'));
-  }
-
   let ext = path.extname(req.file.originalname);
 
   let params = {
