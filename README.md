@@ -30,8 +30,8 @@ To download and run the code, git clone our repo:
 
 Download needed dependencies with ```npm i``` and run the test suites with ```npm run test```.
 
-### Resource Relationships
 
+### Resource Relationships
 # Routes
 
 ## User
