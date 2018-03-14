@@ -25,15 +25,12 @@ Project.findByIdAndAddTask = function(id, task, userId){
   return Project.findById(id)
     .then( project => {
       if(!project) return createError(404);
-      
       task.projectId = project._id;
       task.orgId = project.orgId;
       task.admins = [];
       task.admins.push(userId.toString());
       project.admins.forEach( admin => {
-        if(!task.admins.includes(admin.toString())){
-          task.admins.push(admin);
-        }
+        if(!task.admins.includes(admin.toString())) task.admins.push(admin);
       });
       this.tempProject = project;
       return new Task(task).save();

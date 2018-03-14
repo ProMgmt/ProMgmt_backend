@@ -100,7 +100,6 @@ describe('Attach Routes', function(){
   describe('DELETE: /api/attach/:attachId', () => {
     describe('with VALID uasge', () => {
       it('should return a 204 status code', done => {
-        
         superagent.delete(`${url}/api/attach/${this.tempAttach._id}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
