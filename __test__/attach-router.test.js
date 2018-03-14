@@ -12,12 +12,6 @@ require('jest');
 
 const url = `http://localhost:${PORT}`;
 
-const exampleAttach = {
-  name: 'example attachment',
-  type: 'PDF',
-  attach: `${__dirname}/../data/sample.pdf`,
-};
-
 describe('Attach Routes', function(){
   beforeAll( done => serverToggle.serverOn(server, done));
   afterAll( done => serverToggle.serverOff(server, done));
@@ -26,35 +20,77 @@ describe('Attach Routes', function(){
   beforeAll( done => hooks.createProject(done));
   beforeAll( done => hooks.createTask(done));
   afterAll( done => hooks.removeDBInfo(done));
+  beforeEach( done => {
+    fs.copyFileProm(`${__dirname}/testdata/sample.pdf`, `${__dirname}/../data/sample.pdf`)
+      .then( () => done())
+      .catch(done);
+  });
 
   this.tempAttach = {};
 
   describe('POST: /api/task/:taskId/attach', () => {
     describe('with VALID usage', () => {
-      beforeEach( done => {
-        fs.copyFileProm(`${__dirname}/testdata/sample.pdf`, `${__dirname}/../data/sample.pdf`)
-          .then( () => done())
-          .catch(done);
-      });
-
       it('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/task/${hooks.tempTask._id}/attach`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
-          .field('name', exampleAttach.name)
-          .field('type', exampleAttach.type)
-          .attach('attach', exampleAttach.attach)
+          .field('name', hooks.exampleAttach.name)
+          .field('type', hooks.exampleAttach.type)
+          .attach('attach', hooks.exampleAttach.attach)
           .end((err, res) => {
             if(err) return done(err);
             this.tempAttach = res.body;
             expect(res.status).toEqual(200);
-            expect(res.body.name).toEqual(exampleAttach.name);
-            expect(res.body.type).toEqual(exampleAttach.type);
+            expect(res.body.name).toEqual(hooks.exampleAttach.name);
+            expect(res.body.type).toEqual(hooks.exampleAttach.type);
             expect(res.body.orgId).toEqual(hooks.tempOrg._id.toString());
             expect(res.body.projectId).toEqual(hooks.tempProject._id.toString());
             expect(res.body.taskId).toEqual(hooks.tempTask._id.toString());
             expect(res.body.admins).toEqual(expect.arrayContaining([hooks.tempUser._id.toString()]));
+            done();
+          });
+      });
+    });
+
+    describe('with INVALID usage', () => {
+      it('should return a 404 for an task ID that is not found', done => {
+        superagent.post(`${url}/api/task/5aa843de02f4f95338baaaaa/attach`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .field('name', hooks.exampleAttach.name)
+          .field('type', hooks.exampleAttach.type)
+          .attach('attach', hooks.exampleAttach.attach)
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
+            done();
+          });
+      });
+
+      it('should return a 400 if no file path is not found', done => {
+        superagent.post(`${url}/api/task/${hooks.tempTask._id}/attach`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .field('name', hooks.exampleAttach.name)
+          .field('type', hooks.exampleAttach.type)
+          .attach('attach', '')
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
+
+      it('should return a 400 if the name or type is not supplied', done => {
+        superagent.post(`${url}/api/task/${hooks.tempTask._id}/attach`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .field('type', hooks.exampleAttach.type)
+          .attach('attach', hooks.exampleAttach.attach)
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
             done();
           });
       });
@@ -72,6 +108,30 @@ describe('Attach Routes', function(){
           .end((err, res) => {
             if(err) return done(err);
             expect(res.status).toEqual(204);
+            done();
+          });
+      });
+    });
+
+    describe('with INVALID usage', () => {
+      it('should return a 400 if no ID is provided', done => {
+        superagent.delete(`${url}/api/attach`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
+
+      it('should return a 404 for an ID that is not found', done => {
+        superagent.delete(`${url}/api/attach/5aa843de02f4f95338baaaaa`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(404);
             done();
           });
       });
