@@ -2,7 +2,6 @@
 
 const superagent = require('superagent');
 const server = require('../server.js');
-const serverToggle = require('../lib/toggle.js');
 const hooks = require('../lib/test-hooks.js');
 const PORT = process.env.PORT || 3000;
 
@@ -12,11 +11,11 @@ const url = `http://localhost:${PORT}`;
 
 describe('Task Routes', function() {
   beforeAll( done => {
-    serverToggle.serverOn(server, done);
+    server.serverOn(done);
   });
 
   afterAll( done => {
-    serverToggle.serverOff(server, done);
+    server.serverOff(done);
   });
 
   beforeEach( done => {
