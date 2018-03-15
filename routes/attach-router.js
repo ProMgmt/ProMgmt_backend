@@ -83,6 +83,17 @@ attachRouter.post('/api/task/:taskId/attach', bearerAuth, upload.single('attach'
     .catch(err => next(err));
 });
 
+attachRouter.get('/api/attach/:attachId', bearerAuth, function(req, res, next){
+  debug('GET: /api/attach/:attachId');
+
+  Attach.findById(req.params.attachId)
+    .then( attach => {
+      if (!attach) return next(createError(404));
+      return res.json(attach);
+    })
+    .catch(next);
+});
+
 attachRouter.delete('/api/attach/:attachId', bearerAuth, function(req, res, next){
   debug('DELETE: /api/attach/:attachId');
 
