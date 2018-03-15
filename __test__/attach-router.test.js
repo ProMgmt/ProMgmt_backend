@@ -4,7 +4,6 @@ const superagent = require('superagent');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'), {suffix: 'Prom'});
 const server = require('../server.js');
-const serverToggle = require('../lib/toggle.js');
 const hooks = require('../lib/test-hooks.js');
 const PORT = process.env.PORT || 3000;
 
@@ -13,8 +12,8 @@ require('jest');
 const url = `http://localhost:${PORT}`;
 
 describe('Attach Routes', function(){
-  beforeAll( done => serverToggle.serverOn(server, done));
-  afterAll( done => serverToggle.serverOff(server, done));
+  beforeAll( done => server.serverOn(done));
+  afterAll( done => server.serverOff(done));
   beforeAll( done => hooks.createUser(done));
   beforeAll( done => hooks.createOrg(done));
   beforeAll( done => hooks.createProject(done));
