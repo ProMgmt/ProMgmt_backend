@@ -88,7 +88,7 @@ attachRouter.get('/api/attach/:attachId', bearerAuth, function(req, res, next){
 
   Attach.findById(req.params.attachId)
     .then( attach => {
-      if (!attach) return next(createError(404));
+      // if (!attach) return next(createError(404));
       return res.json(attach);
     })
     .catch(next);
