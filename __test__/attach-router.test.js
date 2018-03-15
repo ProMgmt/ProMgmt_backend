@@ -97,8 +97,60 @@ describe('Attach Routes', function(){
     });
   });
 
+  describe('GET: /api/attach/:attachId', () => {
+    describe('with VALID usage', () => {
+      it('should return status 200 with an attach object', done => {
+        superagent.get(`${url}/api/attach/${this.tempAttach._id}`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body.name).toEqual(hooks.exampleAttach.name);
+            expect(res.body.type).toEqual(hooks.exampleAttach.type);
+            done();
+          });
+      });
+    });
+    describe('with INVALID usage', () => {
+      it('should respond with a 404 for an ID that is not found', done => {
+        superagent.get(`${url}/api/attach/123`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(err.status).toEqual(404);
+            expect(res.status).toEqual(404);
+            done();
+          });
+      });
+
+      it('should respond with a 400 if no Id is provided', done => {
+        superagent.get(`${url}/api/attach/`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            expect(res.text).toEqual('BadRequestError');
+            done();
+          });
+      });
+
+      it('should respond with a 401 if no token was provided', done => {
+        superagent.get(`${url}/api/attach/${this.tempAttach._id}`)
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
+            expect(res.text).toEqual('UnauthorizedError');
+            done();
+          });
+      });
+    });
+  });
+
   describe('DELETE: /api/attach/:attachId', () => {
-    describe('with VALID uasge', () => {
+    describe('with VALID usage', () => {
       it('should return a 204 status code', done => {
         superagent.delete(`${url}/api/attach/${this.tempAttach._id}`)
           .set({
