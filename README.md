@@ -1,4 +1,4 @@
-# ProMgmt [![Build Status](https://travis-ci.org/ProMgmt/ProMgmt_backend.svg?branch=master)](https://travis-ci.org/ProMgmt/ProMgmt_backend) [![Coverage Status](https://coveralls.io/repos/github/ProMgmt/ProMgmt_backend/badge.svg?branch=master)](https://coveralls.io/github/ProMgmt/ProMgmt_backend?branch=master)
+# ProMgmt [![Build Status](https://travis-ci.org/ProMgmt/ProMgmt_backend.svg?branch=master)](https://travis-ci.org/ProMgmt/ProMgmt_backend) [![Coverage Status](https://coveralls.io/repos/github/ProMgmt/ProMgmt_backend/badge.svg?branch=staging)](https://coveralls.io/github/ProMgmt/ProMgmt_backend?branch=staging)
 
 ProMgmt is project management software that helps comapanies, organizations, and teams to define, organize, and manage projects.
 
