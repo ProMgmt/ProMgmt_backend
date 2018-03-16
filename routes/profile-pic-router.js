@@ -102,6 +102,7 @@ profilePicRouter.delete('/api/profilepic/:picId', bearerAuth, function(req, res,
       params.Key = pic.avatarObjectKey;
       return s3deleteProm(params);
     })
+    .then( () => ProfilePic.findByIdAndRemove(req.params.picId))
     .then( () => res.sendStatus(204))
     .catch(next);
 });

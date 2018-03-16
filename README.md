@@ -91,9 +91,43 @@ Upon signup, you can make a profile for your user. To create a profile, the foll
 
 #### ```GET /api/profile/<profileId>```
 
+You can hit this route with a profileId to get that profile. You will recieve the following:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+
+
 #### ```PUT /api/profile/<profileId>```
 
+You can update a profile at this route with at least one of the following key/values:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+Upon success, you will recieve your updated profile object:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+
 #### ```DELETE /api/profile/<profileId>```
+Hitting this route with a valid profileId will delete that resource from our database and return a 204 status.
 
 ## Profile Picture
 
@@ -111,10 +145,20 @@ The route requires a filepath. Upon completion, you'll revieve the following:
 ```
 
 
-#### ```GET /api/profile/<profileId>```
+#### ```GET /api/profilepic/<picId>```
+Hitting this route with a valid picId will return the following object:
+```
+{
+  "userId": "<user id>",
+  "profileId": "<profile id>",
+  "avatarURI": "<URL of photo>",
+  "avatarObjectKey": ""<AWS Object Key>",
+}
+```
 
-#### ```DELETE /api/profile/<profileId>```
-
+#### ```DELETE /api/profilepic/<picId>```
+Hitting this route with a valid picId will delete the pic object and return a 204 status.
+ 
 ## Organization
 
 #### ```POST /api/org```
@@ -208,9 +252,45 @@ The _id of the project will also be added to the array of projects in the associ
 
 #### ```GET /api/project/<projectId>```
 
+You can look up Projects by Id using this route. projectId is a required parameter.
+
+Upon success, you will recieve the following:
+```
+{
+    "_id": "<projectId>",
+    "orgId": "<organizationId>",
+    "admins": [<array of user IDs with admin rights>],
+    "users": [<array of user IDs>],
+    "tasks": [<array of task IDs>],  
+    "projectName": "<projectName>",
+    "desc": "<description of project>",
+    "startDate": "<Date object>",
+    "dueDate": "<Date object>"
+}
+```
+
 #### ```PUT /api/project/<projectId>```
 
+Projects can be updated at this route. projectId is a required parameter, as well as an object containing at least one of the project key:value pairs.
+
+Upon success, you will recieve the following with the updated values:
+```
+{
+    "_id": "<projectId>",
+    "orgId": "<organizationId>",
+    "admins": [<array of user IDs with admin rights>],
+    "users": [<array of user IDs>],
+    "tasks": [<array of task IDs>],   
+    "projectName": "<projectName>",
+    "desc": "<description of project>",
+    "startDate": "<Date object>",
+    "dueDate": "<Date object>"
+}
+```
+
 #### ```DELETE /api/project/<projectId>```
+
+You can delete projects through this route. You will need an projectId in the parameters, and upon successful deletion, you will receive a 204 status.
 
 ## Task
 
@@ -367,6 +447,23 @@ Upon success, you will receive the following:
 #### ```DELETE /api/attach/<attachId>```
 
 You can delete the attachment associated with the attach ID from mongo DB and AWS S3 through this route.  Attach ID is a required parameter for this route.  Upon success you will receive a 204 status code.
+
+# Contributors 
+
+- Nicole Weese
+
+https://github.com/nicoleweese
+
+- Katy Robinson
+
+https://github.com/orgs/ProMgmt/people/katyoleary
+- David Kosmos 
+
+https://github.com/DKosmos
+- Taylor Stemple
+
+https://github.com/orgs/ProMgmt/people/TrrLrr
+
 
 
 
