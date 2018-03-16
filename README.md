@@ -80,10 +80,40 @@ If you hit this route with a valid userId, it will delete the resource from the 
 ## Profile
 
 #### ```POST /api/profile```
+Upon signup, you can make a profile for your user. To create a profile, the following JSON object is needed:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
 
 #### ```GET /api/profile/<profileId>```
 
 #### ```PUT /api/profile/<profileId>```
+
+#### ```DELETE /api/profile/<profileId>```
+
+## Profile Picture
+
+#### ```POST /api/profile/:profileId/pic```
+As you make a profile, you'll be able to upload a profile picture if you wish. The photo will be uploaded to Amazon Web Services S3. 
+
+The route requires a filepath. Upon completion, you'll revieve the following:
+```
+{
+  "userId": "<user id>",
+  "profileId": "<profile id>",
+  "avatarURI": "<URL of photo>",
+  "avatarObjectKey": ""<AWS Object Key>",
+}
+```
+
+
+#### ```GET /api/profile/<profileId>```
 
 #### ```DELETE /api/profile/<profileId>```
 
