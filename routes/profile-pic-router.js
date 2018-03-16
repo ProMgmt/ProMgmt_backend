@@ -30,6 +30,16 @@ function s3uploadProm(params) {
   });
 }
 
+function s3deleteProm(params){
+  debug('s3deleteProm');
+
+  return new Promise((resolve) => {
+    s3.deleteObject(params, (err, s3res) => {
+      resolve(s3res);
+    });
+  });
+}
+
 profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('image'), function(req, res, next) {
   debug('POST: /api/profile/profileId/pic');
 
@@ -65,4 +75,39 @@ profilePicRouter.post('/api/profile/:profileId/pic', bearerAuth, upload.single('
     })
     .then( profilePic => res.json(profilePic))
     .catch(next);
+});
+
+profilePicRouter.get('/api/profilepic/:picId', bearerAuth, function(req, res, next){
+  debug('GET: /api/profilepic/:picId');
+
+  ProfilePic.findById(req.params.picId)
+    .then( pic => {
+      // if(!pic) return next(createError(404));
+      return res.json(pic);
+    })
+    .catch(next);
+});
+
+profilePicRouter.delete('/api/profilepic/:picId', bearerAuth, function(req, res, next){
+  debug('DELETE: /api/profilepic/:picId');
+
+  let params = {
+    Bucket: process.env.AWS_BUCKET,
+    Key: '',
+  };
+
+  ProfilePic.findById(req.params.picId)
+    .then( pic => {
+      // if(!pic) return next(createError(404, 'pic not found'));
+      params.Key = pic.avatarObjectKey;
+      return s3deleteProm(params);
+    })
+    .then( () => res.sendStatus(204))
+    .catch(next);
+});
+
+profilePicRouter.all('/api/profilepic', function(req, res, next){
+  debug('ALL: /api/profilepic');
+
+  return next(createError(400, 'no pic ID provided'));
 });
