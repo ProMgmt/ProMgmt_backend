@@ -207,10 +207,43 @@ Upon success, the user that created the project will be given admin rights, and 
 The _id of the project will also be added to the array of projects in the associated org resource.
 
 #### ```GET /api/project/<projectId>```
+You can look up Projects by Id using this route. projectId is a required parameter.
+
+Upon success, you will recieve the following:
+```
+{
+    "_id": "<projectId>",
+    "orgId": "<organizationId>",
+    "admins": [<array of user IDs with admin rights>],
+    "users": [<array of user IDs>],
+    "tasks": [<array of task IDs>],  
+    "projectName": "<projectName>",
+    "desc": "<description of project>",
+    "startDate": "<Date object>",
+    "dueDate": "<Date object>"
+}
+```
 
 #### ```PUT /api/project/<projectId>```
+Projects can be updated at this route. projectId is a required parameter, as well as an object containing at least one of the project key:value pairs.
+
+Upon success, you will recieve the following with the updated values:
+```
+{
+    "_id": "<projectId>",
+    "orgId": "<organizationId>",
+    "admins": [<array of user IDs with admin rights>],
+    "users": [<array of user IDs>],
+    "tasks": [<array of task IDs>],   
+    "projectName": "<projectName>",
+    "desc": "<description of project>",
+    "startDate": "<Date object>",
+    "dueDate": "<Date object>"
+}
+```
 
 #### ```DELETE /api/project/<projectId>```
+You can delete projects through this route. You will need an projectId in the parameters, and upon successful deletion, you will receive a 204 status.
 
 ## Task
 
