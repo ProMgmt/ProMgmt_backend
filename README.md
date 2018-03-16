@@ -407,7 +407,7 @@ You can delete the attachment associated with the attach ID from mongo DB and AW
 # Contributors 
 
 - Nicole Weese
-[GitHub]: https://github.com/nicoleweese
+[GitHub]: (https://github.com/nicoleweese)
 - Katy Robinson
 - David Kosmos 
 - Taylor Stemple
