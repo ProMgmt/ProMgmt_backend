@@ -151,10 +151,16 @@ The _id of the project will also be added to the array of projects in the associ
 
 #### ```POST /api/project/<projectId>/task```
 
-You can add tasks to a specific project at this route. The only thing sent on the back end is a JSON object witha  single key/value pair:
+You can add tasks to a specific project at this route. Project ID is a required parameter, and the request body should contain the following:
 ```
 {
   "desc": "<task description>",
+  "startDate": "<updated start date>",
+  "endDate": "<updated end date>",
+  "expectedDuration": "<updated expected duration>",
+  "actualDuration": "<updated actual duration>",
+  "status": "<updated status>",
+  "isDependency": "<true/false>"
 }
 ```
 
@@ -168,18 +174,134 @@ Upon success, you will recieve the following:
     "orgId": "<orgId of parent organization>",
     "projectId": "<projectId>",
     "subTasks": [<array of child tasks>],
+    "startDate": "<updated start date>",
+    "endDate": "<updated end date>",
+    "expectedDuration": "<updated expected duration>",
+    "actualDuration": "<updated actual duration>",
+    "status": "<updated status>",
+    "isDependency": "<true/false>"
 }
 ```
 
 #### ```GET /api/task/<taskId>```
 
+You can look up tasks by taskId through this route. TaskId is a required parameter
+
+Upon success, you will recieve the following:
+```
+{
+    "_id": "5aa9938031e7c464df9e1f7a",
+    "admins": ["<array of userIds with admin rights>"],
+    "dependentTasks": [<array of taskIds that are dependent on this one>],
+    "desc": "<task description>",
+    "orgId": "<orgId of parent organization>",
+    "projectId": "<projectId>",
+    "subTasks": [<array of child tasks>],
+    "startDate": "<updated start date>",
+    "endDate": "<updated end date>",
+    "expectedDuration": "<updated expected duration>",
+    "actualDuration": "<updated actual duration>",
+    "status": "<updated status>",
+    "isDependency": "<true/false>"
+}
+```
+
 #### ```PUT /api/task/<taskId>```
 
-#### ```DELETE /api/task/<tskId>```
+You can update tasks by taskId through this route. TaskId is a required parameter as well as an object containing key:value pairs containing requested changes:
+
+request body:
+```
+  {
+    "admins": ["update list of admins"],
+    "dependentTasks": ["updated list of dependent tasks"],
+    "subTasks": ["updated list of sub tasks"],
+    "desc": "<updated description>",
+    "startDate": "<updated start date>",
+    "endDate": "<updated end date>",
+    "expectedDuration": "<updated expected duration>",
+    "actualDuration": "<updated actual duration>",
+    "status": "<updated status>",
+    "isDependency": "<true/false>"
+  }
+```
 
 
+Upon success, you will recieve the following:
+```
+{
+    "_id": "5aa9938031e7c464df9e1f7a",
+    "admins": ["<array of userIds with admin rights>"],
+    "dependentTasks": [<array of taskIds that are dependent on this one>],
+    "desc": "<task description>",
+    "orgId": "<orgId of parent organization>",
+    "projectId": "<projectId>",
+    "subTasks": [<array of child tasks>],
+    "startDate": "<updated start date>",
+    "endDate": "<updated end date>",
+    "expectedDuration": "<updated expected duration>",
+    "actualDuration": "<updated actual duration>",
+    "status": "<updated status>",
+    "isDependency": "<true/false>"
+}
+```
 
+#### ```DELETE /api/task/<taskId>```
 
+You can delete tasks and their associated relationships through this route.  TaskId is a required parameter.  Upon success you will receive a 204 status code.
+
+## Attachment
+
+#### ```POST /api/task/<taskId>/attach```
+
+You can add attachments to specific tasks through this route.  The attachment will be uploaded to Amazon Web Services S3 and the database will retain information necessary to access the attachment.
+
+The route requires a task ID request parameter and a body containing:
+```
+{
+  "name": "<name of the attachment>",
+  "type": "<type of attachment>",
+  "attach": "<directory location of attachment file>"
+}
+```
+
+Upon success, you will receive the following:
+```
+{
+  "name": "<name of attachment>",
+  "taskId": "<id of related task>",
+  "projectId": "<id of project inherited from related task>",
+  "orgId": "<id of org inherited from project inherited from related task>",
+  "admins": ["<array of users with admin privledges on this attachment>"],
+  "type": "<type of attachment>",
+  "attURI": "<URL of attachment>",
+  "objectKey": "<AWS Object Key>",
+  "created": "<date created>"
+}
+```
+
+#### ```GET /api/attach/<attachId>```
+
+You can get the mongoDB object representing the attachment associated with the attach ID.  Attach ID is a required parameter for this route.
+
+Upon success, you will receive the following:
+```
+{
+  "name": "<name of attachment>",
+  "taskId": "<id of related task>",
+  "projectId": "<id of project inherited from related task>",
+  "orgId": "<id of org inherited from project inherited from related task>",
+  "admins": ["<array of users with admin privledges on this attachment>"],
+  "type": "<type of attachment>",
+  "attURI": "<URL of attachment>",
+  "objectKey": "<AWS Object Key>",
+  "created": "<date created>"
+}
+```
+
+#### ```DELETE /api/attach/<attachId>```
+
+You can delete the attachment associated with the attach ID from mongo DB and AWS S3 through this route.  Attach ID is a required parameter for this route.  Upon success you will receive a 204 status code.
 
 
 
