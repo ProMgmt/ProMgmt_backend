@@ -71,8 +71,6 @@ Once you have a have an account, you can hit this route with proper basic Auth, 
 ```
 
 
-#### ```PUT /api/user/<userId>```
-
 #### ```DELETE /api/user/<userId>```
 
 If you hit this route with a valid userId, it will delete the resource from the database, and return a 204 status.
@@ -111,9 +109,46 @@ If successful, the user that created the organization will be made the admin for
 ```
 #### ```GET /api/org/<ordId>```
 
+You can look up Organizations by Id using this route. OrgId is a required parameter.
+
+Upon success, you will recieve the following:
+```
+{
+    "_id": "<organizationId>",
+    "admins": [<array of users with admin rights>],
+    "desc": "<description>",
+    "name": "<organizationName>",
+    "projects": [<array of projects owned by organization>],
+    "users": [<array of users belonging to organization>],
+}
+```
+
+
 #### ```PUT /api/org/<orgId>```
 
+Organizations can be updated at this route. OrgId is a required parameter, as well as an object containing at least one of the following key:value pairs.
+```
+{
+  "name": "<organizationName>",
+  "desc": "<brief overview of organization>",
+}
+```
+
+Upon success, you will recieve the following:
+```
+{
+    "_id": "<organizationId>",
+    "admins": [<array of users with admin rights>],
+    "desc": "<description>",
+    "name": "<organizationName>",
+    "projects": [<array of projects owned by organization>],
+    "users": [<array of users belonging to organization>],
+}
+```
+
 #### ```DELETE /api/org/<orgId>```
+
+You can delete organizations through this route. You will need an OrgId in the parameters, and upon successful deletion, you will receive a 204 status.  
 
 ## Project
 
@@ -176,6 +211,8 @@ Upon success, you will recieve the following:
 #### ```PUT /api/task/<taskId>```
 
 #### ```DELETE /api/task/<tskId>```
+
+
 
 
 
