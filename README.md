@@ -409,9 +409,16 @@ You can delete the attachment associated with the attach ID from mongo DB and AW
 - Nicole Weese
 
 https://github.com/nicoleweese
+
 - Katy Robinson
+
+https://github.com/orgs/ProMgmt/people/katyoleary
 - David Kosmos 
+
+https://github.com/DKosmos
 - Taylor Stemple
+
+https://github.com/orgs/ProMgmt/people/TrrLrr
 
 
 
