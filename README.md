@@ -368,6 +368,14 @@ Upon success, you will receive the following:
 
 You can delete the attachment associated with the attach ID from mongo DB and AWS S3 through this route.  Attach ID is a required parameter for this route.  Upon success you will receive a 204 status code.
 
+# Contributors 
+
+- Nicole Weese
+- Katy Robinson
+- David Kosmos 
+- Taylor Stemple
+
+
 
 
 
