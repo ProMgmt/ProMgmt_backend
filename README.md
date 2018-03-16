@@ -91,9 +91,43 @@ Upon signup, you can make a profile for your user. To create a profile, the foll
 
 #### ```GET /api/profile/<profileId>```
 
+You can hit this route with a profileId to get that profile. You will recieve the following:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+
+
 #### ```PUT /api/profile/<profileId>```
 
+You can update a profile at this route with at least one of the following key/values:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+Upon success, you will recieve your updated profile object:
+```
+{
+  "firstName": "<users first name>",
+  "lastName": "<users last name>",
+  "desc": "<brief personal description>",
+  "title": "<ones title within their company>",
+  "company": "<company name>"
+}
+```
+
 #### ```DELETE /api/profile/<profileId>```
+Hitting this route with a valid profileId will delete that resource from our database and return a 204 status.
 
 ## Profile Picture
 
@@ -111,10 +145,20 @@ The route requires a filepath. Upon completion, you'll revieve the following:
 ```
 
 
-#### ```GET /api/profile/<profileId>```
+#### ```GET /api/profilepic/<picId>```
+Hitting this route with a valid picId will return the following object:
+```
+{
+  "userId": "<user id>",
+  "profileId": "<profile id>",
+  "avatarURI": "<URL of photo>",
+  "avatarObjectKey": ""<AWS Object Key>",
+}
+```
 
-#### ```DELETE /api/profile/<profileId>```
-
+#### ```DELETE /api/profilepic/<picId>```
+Hitting this route with a valid picId will delete the pic object and return a 204 status.
+ 
 ## Organization
 
 #### ```POST /api/org```
