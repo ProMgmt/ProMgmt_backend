@@ -38,6 +38,7 @@ describe('Org Routes', function() {
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
+            console.log('res.body', res.body);
             if(err) return done(err);
             expect(res.status).toEqual(200);
             expect(res.body.name).toEqual(hooks.exampleOrg.name);
@@ -78,6 +79,7 @@ describe('Org Routes', function() {
     afterEach( () => {
       delete hooks.exampleOrg.userID;
     });
+
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/org/${hooks.tempOrg._id}`)
@@ -201,6 +203,40 @@ describe('Org Routes', function() {
             done();
           });
       });  
+    });
+  });
+
+  describe.only('GET /api/org/user/me', () => {
+    beforeEach( done => {
+      hooks.createUser(done);
+    });
+
+    beforeEach( done => {
+      hooks.createOrg(done);
+    });
+
+    beforeEach( done => {
+      hooks.createProject(done);
+    });
+
+    afterEach( () => {
+      delete hooks.exampleOrg.userID;
+    });
+
+    describe('with VALID usage', () => {
+      it('should return a 200 status code for valid requests', done => {
+        superagent.get(`${url}/api/org/user/me`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            console.log('hooks.tempProject', hooks.tempProject);
+            console.log('res.body', res.body);
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            done();
+          });
+      });
     });
   });
 
