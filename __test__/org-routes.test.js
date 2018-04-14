@@ -218,6 +218,10 @@ describe('Org Routes', function() {
       hooks.createProject(done);
     });
 
+    beforeEach( done => {
+      hooks.createTask(done);
+    });
+
     afterEach( () => {
       delete hooks.exampleOrg.userID;
     });
@@ -229,11 +233,12 @@ describe('Org Routes', function() {
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
-            console.log('hooks.tempProject', hooks.tempProject);
-            console.log('res.body', res.body);
-            console.log('res.body.projects', res.body[0].projects);
             if(err) return done(err);
             expect(res.status).toEqual(200);
+            expect(res.body[0].name).toEqual(hooks.tempOrg.name);
+            expect(res.body[0].desc).toEqual(hooks.tempOrg.desc);
+            expect(res.body[0].projects[0]._id.toString()).toEqual(hooks.tempProject._id.toString());
+            expect(res.body[0].projects[0].tasks[0]._id.toString()).toEqual(hooks.tempTask._id.toString());
             done();
           });
       });
