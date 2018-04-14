@@ -38,7 +38,6 @@ describe('Org Routes', function() {
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
-            console.log('res.body', res.body);
             if(err) return done(err);
             expect(res.status).toEqual(200);
             expect(res.body.name).toEqual(hooks.exampleOrg.name);
@@ -232,6 +231,7 @@ describe('Org Routes', function() {
           .end((err, res) => {
             console.log('hooks.tempProject', hooks.tempProject);
             console.log('res.body', res.body);
+            console.log('res.body.projects', res.body[0].projects);
             if(err) return done(err);
             expect(res.status).toEqual(200);
             done();

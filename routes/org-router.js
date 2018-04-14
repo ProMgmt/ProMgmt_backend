@@ -25,11 +25,9 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
 orgRouter.get('/api/org/user/me', bearerAuth, (req, res, next) => {
   debug('GET: /api/org/user/me');
 
-  console.log('req.user', req.user);
   Org.find({$or: [{users: req.user._id.toString()}, {admins: req.user._id.toString()}]})
     .populate('projects')
     .then(orgs => {
-      console.log('orgs', orgs);
       if(!orgs) return next(createError(404));
       return res.json(orgs);
     })
