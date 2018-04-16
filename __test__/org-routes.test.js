@@ -78,6 +78,7 @@ describe('Org Routes', function() {
     afterEach( () => {
       delete hooks.exampleOrg.userID;
     });
+
     describe('with VALID usage', () => {
       it('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/org/${hooks.tempOrg._id}`)
@@ -201,6 +202,46 @@ describe('Org Routes', function() {
             done();
           });
       });  
+    });
+  });
+
+  describe('GET /api/org/user/me', () => {
+    beforeEach( done => {
+      hooks.createUser(done);
+    });
+
+    beforeEach( done => {
+      hooks.createOrg(done);
+    });
+
+    beforeEach( done => {
+      hooks.createProject(done);
+    });
+
+    beforeEach( done => {
+      hooks.createTask(done);
+    });
+
+    afterEach( () => {
+      delete hooks.exampleOrg.userID;
+    });
+
+    describe('with VALID usage', () => {
+      it('should return a 200 status code for valid requests', done => {
+        superagent.get(`${url}/api/org/user/me`)
+          .set({
+            Authorization: `Bearer ${hooks.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(200);
+            expect(res.body[0].name).toEqual(hooks.tempOrg.name);
+            expect(res.body[0].desc).toEqual(hooks.tempOrg.desc);
+            expect(res.body[0].projects[0]._id.toString()).toEqual(hooks.tempProject._id.toString());
+            expect(res.body[0].projects[0].tasks[0]._id.toString()).toEqual(hooks.tempTask._id.toString());
+            done();
+          });
+      });
     });
   });
 
