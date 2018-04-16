@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 
 mongoose.connect(process.env.MONGODB_URI);
 
-//remove for cleanliness later
+// TODO: remove for cleanliness later
 
 app.get('/oauth/google/code', function(req, res) {
   if (!req.query.code) {
