@@ -43,13 +43,13 @@ describe('Task Routes', function() {
     hooks.createTask2(done);
   });
 
-  afterEach( done => {
-    hooks.removeDBInfo(done);
-  });
+  // afterEach( done => {
+  //   hooks.removeDBInfo(done);
+  // });
 
   describe('POST: /api/project/:projectId/task', () => {
     describe('with VALID usage', () => {
-      it('should return a 200 status code for valid requests', done => {
+      it.only('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/project/${hooks.tempProject._id}/task`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,

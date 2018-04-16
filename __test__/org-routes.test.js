@@ -227,13 +227,14 @@ describe('Org Routes', function() {
     });
 
     describe('with VALID usage', () => {
-      it('should return a 200 status code for valid requests', done => {
+      it.only('should return a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/org/user/me`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);
+            console.log('::::res.body::::', res.body);
             expect(res.status).toEqual(200);
             expect(res.body[0].name).toEqual(hooks.tempOrg.name);
             expect(res.body[0].desc).toEqual(hooks.tempOrg.desc);
