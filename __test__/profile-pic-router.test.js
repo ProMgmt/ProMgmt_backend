@@ -18,7 +18,7 @@ describe('Profile Picture Routes', function() {
   afterAll( done => serverToggle.serverOff(server, done));
   beforeAll( done => hooks.createUser(done));
   beforeAll( done => hooks.createProfile(done));
-  // afterAll( done => hooks.removeDBInfo(done));
+  afterAll( done => hooks.removeDBInfo(done));
 
   this.tempPic = {};
 
