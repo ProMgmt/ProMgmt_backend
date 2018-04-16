@@ -19,7 +19,7 @@ describe('Attach Routes', function(){
   beforeAll( done => hooks.createOrg(done));
   beforeAll( done => hooks.createProject(done));
   beforeAll( done => hooks.createTask(done));
-  // afterAll( done => hooks.removeDBInfo(done));
+  afterAll( done => hooks.removeDBInfo(done));
   beforeEach( done => {
     fs.copyFileProm(`${__dirname}/testdata/sample.pdf`, `${__dirname}/../data/sample.pdf`)
       .then( () => done())
