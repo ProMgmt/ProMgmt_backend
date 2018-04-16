@@ -49,7 +49,7 @@ describe('Task Routes', function() {
 
   describe('POST: /api/project/:projectId/task', () => {
     describe('with VALID usage', () => {
-      it.only('should return a 200 status code for valid requests', done => {
+      it('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/project/${hooks.tempProject._id}/task`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
