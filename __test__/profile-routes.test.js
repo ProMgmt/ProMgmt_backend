@@ -32,7 +32,7 @@ describe('Profile Routes', function () {
 
   describe('POST: /api/user/:userId/profile', () => {
     describe('with VALID usage', () => {
-      it.only('should return a 200 status code for valid requests', done => {
+      it('should return a 200 status code for valid requests', done => {
         superagent.post(`${url}/api/user/${hooks.tempUser._id}/profile`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
