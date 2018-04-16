@@ -8,6 +8,7 @@
   },
   "scripts": {
     "coverage": "DEBUG='promgmt*' jest -i --coverage",
+    "testprofile": "DEBUG='promgmt*' jest -i --coverage profile-routes.test.js",
     "test": "DEBUG='promgmt*' jest -i --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "DEBUG='promgmt*' node server.js"
   },
