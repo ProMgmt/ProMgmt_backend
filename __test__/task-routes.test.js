@@ -43,9 +43,9 @@ describe('Task Routes', function() {
     hooks.createTask2(done);
   });
 
-  // afterEach( done => {
-  //   hooks.removeDBInfo(done);
-  // });
+  afterEach( done => {
+    hooks.removeDBInfo(done);
+  });
 
   describe('POST: /api/project/:projectId/task', () => {
     describe('with VALID usage', () => {
