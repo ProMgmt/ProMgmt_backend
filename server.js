@@ -54,10 +54,18 @@ app.get('/oauth/google/code', function(req, res) {
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have profile pic, name etc in the response.body. need to make a profile for them here. 
-        res.cookie('X-Some-Cookie', 'some token');
+        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have 'gender', 'given_name', 'family_name', 'picture', 'email' in the response.body. need to make a profile for them here. 
+        res.cookie('X-Promgmt-token', 'promgmt token');
         // interact with your db and add them if they dont exist alraeady
-        res.redirect(process.env.CLIENT_URL); //this is where we make frontend go back from google oauth to our frontend. now we can interact with out database and get token
+
+        let firstName = `${response.body.given_name}`;
+        let lastName = `${response.body.family_name}`;
+        let picture = `${response.body.picture}`;
+        let email = `${response.body.email}`;
+
+        let redirectURL = `${process.env.CLIENT_URL}?${firstName}&${lastName}&${picture}&${email}`;
+
+        res.redirect(`${redirectURL}`); //this is where we make frontend go back from google oauth to our frontend. now we can interact with our database and get token
       });
   }
 });
