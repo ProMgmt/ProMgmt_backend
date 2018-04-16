@@ -22,6 +22,18 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
     .catch(next);
 });
 
+orgRouter.get('/api/org/user/me', bearerAuth, (req, res, next) => {
+  debug('GET: /api/org/user/me');
+
+  Org.find({$or: [{users: req.user._id.toString()}, {admins: req.user._id.toString()}]})
+    .populate({path: 'projects', populate: {path: 'tasks'}})
+    .then(orgs => {
+      if(!orgs) return next(createError(404));
+      return res.json(orgs);
+    })
+    .catch(next);
+});
+
 orgRouter.get('/api/org/:orgId', bearerAuth, function(req, res, next) {
   debug('GET: /api/org/orgId');
 
