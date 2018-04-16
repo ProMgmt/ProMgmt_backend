@@ -234,6 +234,7 @@ describe('Org Routes', function() {
           })
           .end((err, res) => {
             if(err) return done(err);
+            console.log('::::res.body::::', res.body);
             expect(res.status).toEqual(200);
             expect(res.body[0].name).toEqual(hooks.tempOrg.name);
             expect(res.body[0].desc).toEqual(hooks.tempOrg.desc);
