@@ -47,4 +47,3 @@ userRouter.delete('/api/user/:userId', bearerAuth, function(req, res, next) {
     .then( () => res.sendStatus(204))
     .catch(next);
 });
-  

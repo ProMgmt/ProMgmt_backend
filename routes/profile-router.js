@@ -14,7 +14,6 @@ const profileRouter = module.exports = Router();
 
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
-
   req.body.userId = req.params.userId;
 
   User.findById(req.params.userId)
@@ -28,8 +27,21 @@ profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function
 
 //GET ROUTE
 
+profileRouter.get('/api/profile/:firstName/:lastName', bearerAuth, function (req, res, next) {
+  debug('GET: /api/profile/:firstName/:lastName');
+
+  // TODO: add functionality so that it is not case sensitive
+
+  Profile.find({ firstName: req.params.firstName, lastName: req.params.lastName })
+    .then(profile => {
+      if(!profile) return next(createError(404, 'user not found'));
+      return res.send(profile);
+    })
+    .catch(next);
+});
+
 profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, next) {
-  debug('GET: /api/profile/profileId');
+  debug('GET: /api/profile/:profileId');
 
   Profile.findById(req.params.profileId)
     .then(profile => {
@@ -68,7 +80,7 @@ profileRouter.delete('/api/profile/:profileId', bearerAuth, function (req, res, 
 
 profileRouter.all('/api/profile', function(req, res, next) {
   debug('ALL: /api/profile');
-
+  console.log('route hit');
   return next(createError(400));
 });
 
