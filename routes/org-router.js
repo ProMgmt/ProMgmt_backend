@@ -26,7 +26,11 @@ orgRouter.get('/api/org/user/me', bearerAuth, (req, res, next) => {
   debug('GET: /api/org/user/me');
 
   Org.find({$or: [{users: req.user._id.toString()}, {admins: req.user._id.toString()}]})
-    .populate({path: 'projects', populate: {path: 'tasks'}})
+    .populate({path: 'projects', populate: {path: 'tasks', populate: {path: 'admins'}}})
+    .populate({path: 'projects', populate: {path: 'admins'}})
+    .populate({path: 'projects', populate: {path: 'users'}})
+    .populate('admins')
+    .populate('users')
     .then(orgs => {
       if(!orgs) return next(createError(404));
       return res.json(orgs);
