@@ -125,8 +125,3 @@ const server = module.exports = app.listen(PORT, () => {
 });
 
 server.isRunning = true;
-
-
-// our url:
-// http://localhost:8080/?firstName=Katy&lastName=Robinson&picture=https://lh5.googleusercontent.com/-PQ_hB_MyqVQ/AAAAAAAAAAI/AAAAAAAAAeQ/nzcMv1zh42Q/photo.jpg?sz=50&email=katelynolearyyy@gmail.com&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjdhNzQyYjIwNzIxOTgwZmI4Mjg1NTI3NmQ0NjQxODE5OWRjMTU4OWZhODBmZDNmZWIwMWRhYjI1NDNmZGIzY2MiLCJpYXQiOjE1MjM5MjU5NDZ9.Zueb_ZCa3NF8cSBzTm77xvW28EgHGA3Qdk2c3i1QKz4#
-//
