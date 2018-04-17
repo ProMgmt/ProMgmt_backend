@@ -16,8 +16,11 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
     return next(createError(400,'Bad Request'));
   }
 
-  req.body.admins = req.user._id;
+  req.body.admins.push(req.user._id);
+  console.log('admins array', req.body.admins);
+  
   new Org(req.body).save()
+    .then(org => console.log(res.json(org)))
     .then( org => res.json(org))
     .catch(next);
 });
