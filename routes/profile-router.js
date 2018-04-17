@@ -14,6 +14,7 @@ const profileRouter = module.exports = Router();
 
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
+  req.body.userId = req.params.userId;
 
   User.findById(req.params.userId)
     .then(user => {
@@ -40,7 +41,7 @@ profileRouter.get('/api/profile/:firstName/:lastName', bearerAuth, function (req
 });
 
 profileRouter.get('/api/profile/:profileId', bearerAuth, function (req, res, next) {
-  debug('GET: /api/profile/profileId');
+  debug('GET: /api/profile/:profileId');
 
   Profile.findById(req.params.profileId)
     .then(profile => {

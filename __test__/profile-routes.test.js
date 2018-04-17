@@ -114,7 +114,6 @@ describe('Profile Routes', function () {
           .end((err, res) => {
             if (err) return done(err);
             expect(res.status).toEqual(200);
-
             expect(res.body.desc).toEqual(hooks.exampleProfile.desc.toString());
             expect(res.body.firstName).toEqual(hooks.exampleProfile.firstName.toString());
             expect(res.body.lastName).toEqual(hooks.exampleProfile.lastName.toString());
@@ -122,14 +121,15 @@ describe('Profile Routes', function () {
           });
       });
 
-      it.only('should return with a 200 status code for valid requests', done => {
+      it('should return with a 200 status code for valid requests', done => {
         superagent.get(`${url}/api/profile/${hooks.tempProfile.firstName}/${hooks.tempProfile.lastName}`)
           .set({
             Authorization: `Bearer ${hooks.tempToken}`,
           })
           .end((err, res) => {
             if(err) return done(err);
-            expect(res.body).toEqual();
+            expect(res.status).toEqual(200);
+            done();
           });
       });
     });

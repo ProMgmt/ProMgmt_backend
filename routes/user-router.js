@@ -23,7 +23,10 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   user.generatePasswordHash(password)
     .then( user => user.save())
     .then( user => user.generateToken())
-    .then( token => res.send(token))
+    .then( token => {
+      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
+      res.send(token);
+    })
     .catch(next);
 });
 
@@ -36,7 +39,10 @@ userRouter.get('/api/signin', basicAuth, function(req, res, next) {
       return user.comparePasswordHash(req.auth.password);
     })
     .then( user => user.generateToken())
-    .then( token => res.send(token))
+    .then( token => {
+      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
+      res.send(token);
+    })
     .catch(next);
 });
 
