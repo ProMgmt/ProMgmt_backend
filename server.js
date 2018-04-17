@@ -5,7 +5,7 @@ const debug = require('debug')('promgmt:server');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv =  require('dotenv');
-const cors = require('cors');
+// const cors = require('cors');
 const superagent = require('superagent');
 const uuid = require('uuid/v4');
 
@@ -17,6 +17,8 @@ const projectRouter = require('./routes/project-router.js');
 const taskRouter = require('./routes/task-router.js');
 const attachRouter = require('./routes/attach-router.js');
 const User = require('./model/user.js');
+const Profile = require('./model/profile.js');
+const ProfilePic = require('./model/profile-pic.js');
 
 const errors = require('./lib/err-middleware.js');
 
@@ -56,21 +58,14 @@ app.get('/oauth/google/code', function(req, res) {
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have 'gender', 'given_name', 'family_name', 'picture', 'email' in the response.body. need to make a profile for them here. 
-        res.cookie('X-Promgmt-token', 'promgmt token');
-        // interact with your db and add them if they dont exist alraeady
+        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); 
 
         let {
           given_name: firstName, 
           family_name: lastName, 
           email, 
-          picture, 
+          picture: avatarURI, 
         } = response.body;
-
-        const firstNameQuery = `firstName=${firstName}`;
-        const lastNameQuery = `lastName=${lastName}`;
-        const emailQuery = `email=${email}`;
-        const pictureQuery = `picture=${picture}`;
         
         User.findOne({ email })
           .then( user => {
@@ -78,23 +73,43 @@ app.get('/oauth/google/code', function(req, res) {
               return user.generateToken();
             } else {
               return new User({ email, username: email, password: uuid() }).save()
+              
                 
                 .then( user => user.generateFindHash())
-                // .then( user => user.save())
-                .then( user => user.generateToken())
+                .then( user => {
+                  const userId = user._id;
+                  const profile = {
+                    firstName, 
+                    lastName, 
+                    userId,
+                    desc: 'tell us about yourself...', 
+                  };
+                  return new Profile(profile).save()
+                    .then(profile => 
+                      new ProfilePic({
+                        userId,
+                        profileId: profile._id, 
+                        avatarURI,
+                      })
+                    ) 
+                    .then( () => user.generateToken())
+                    .catch(console.log);
+                })
+                
                 .catch(console.log);
 
             }
           }) 
           .then( token => {
-            const tokenQuery = `token=${token}`;
+            // const tokenQuery = `token=${token}`;
 
             console.log('TOKEN!', token);
             
-            let redirectURL = `${process.env.CLIENT_URL}?${firstNameQuery}&${lastNameQuery}&${pictureQuery}&${emailQuery}&${tokenQuery}`;
+            let redirectURL = `${process.env.CLIENT_URL}`;
 
             console.log('DIS YER URL', `${redirectURL}`);
 
+            res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
             res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
             
           })
@@ -105,10 +120,10 @@ app.get('/oauth/google/code', function(req, res) {
   }
 });
 
-app.use(cors({
-  origin: process.env.CORS_ORIGINS.split(' '),
-  credentials: true,
-}));
+// app.use(cors({
+//   origin: process.env.CORS_ORIGINS.split(' '),
+//   credentials: true,
+// }));
 app.use(morgan('dev'));
 app.use(userRouter);
 app.use(profileRouter);
