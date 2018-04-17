@@ -205,7 +205,7 @@ describe('Org Routes', function() {
     });
   });
 
-  describe('GET /api/org/user/me', () => {
+  describe.only('GET /api/org/user/me', () => {
     beforeEach( done => {
       hooks.createUser(done);
     });
