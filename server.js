@@ -62,7 +62,10 @@ app.get('/oauth/google/code', function(req, res) {
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGINS.split(' '),
+  credentials: true,
+}));
 app.use(morgan('dev'));
 app.use(userRouter);
 app.use(profileRouter);

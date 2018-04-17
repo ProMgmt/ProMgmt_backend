@@ -16,8 +16,11 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
     return next(createError(400,'Bad Request'));
   }
 
-  req.body.admins = req.user._id;
+  req.body.admins.push(req.user._id);
+  console.log('admins array', req.body.admins);
+  
   new Org(req.body).save()
+    .then(org => console.log(res.json(org)))
     .then( org => res.json(org))
     .catch(next);
 });
@@ -26,7 +29,11 @@ orgRouter.get('/api/org/user/me', bearerAuth, (req, res, next) => {
   debug('GET: /api/org/user/me');
 
   Org.find({$or: [{users: req.user._id.toString()}, {admins: req.user._id.toString()}]})
-    .populate({path: 'projects', populate: {path: 'tasks'}})
+    .populate({path: 'projects', populate: {path: 'tasks', populate: {path: 'admins'}}})
+    .populate({path: 'projects', populate: {path: 'admins'}})
+    .populate({path: 'projects', populate: {path: 'users'}})
+    .populate('admins')
+    .populate('users')
     .then(orgs => {
       if(!orgs) return next(createError(404));
       return res.json(orgs);
