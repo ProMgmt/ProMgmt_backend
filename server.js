@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const dotenv =  require('dotenv');
 const cors = require('cors');
 const superagent = require('superagent');
+const uuid = require('uuid/v4');
 
 const userRouter = require('./routes/user-router.js');
 const profileRouter = require('./routes/profile-router.js');
@@ -15,6 +16,7 @@ const orgRouter = require('./routes/org-router.js');
 const projectRouter = require('./routes/project-router.js');
 const taskRouter = require('./routes/task-router.js');
 const attachRouter = require('./routes/attach-router.js');
+const User = require('./model/user.js');
 
 const errors = require('./lib/err-middleware.js');
 
@@ -54,10 +56,51 @@ app.get('/oauth/google/code', function(req, res) {
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have profile pic, name etc in the response.body. need to make a profile for them here. 
-        res.cookie('X-Some-Cookie', 'some token');
+        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have 'gender', 'given_name', 'family_name', 'picture', 'email' in the response.body. need to make a profile for them here. 
+        res.cookie('X-Promgmt-token', 'promgmt token');
         // interact with your db and add them if they dont exist alraeady
-        res.redirect(process.env.CLIENT_URL); //this is where we make frontend go back from google oauth to our frontend. now we can interact with out database and get token
+
+        let {
+          given_name: firstName, 
+          family_name: lastName, 
+          email, 
+          picture, 
+        } = response.body;
+
+        const firstNameQuery = `firstName=${firstName}`;
+        const lastNameQuery = `lastName=${lastName}`;
+        const emailQuery = `email=${email}`;
+        const pictureQuery = `picture=${picture}`;
+        
+        User.findOne({ email })
+          .then( user => {
+            if (user) {
+              return user.generateToken();
+            } else {
+              return new User({ email, username: email, password: uuid() }).save()
+                
+                .then( user => user.generateFindHash())
+                // .then( user => user.save())
+                .then( user => user.generateToken())
+                .catch(console.log);
+
+            }
+          }) 
+          .then( token => {
+            const tokenQuery = `token=${token}`;
+
+            console.log('TOKEN!', token);
+            
+            let redirectURL = `${process.env.CLIENT_URL}?${firstNameQuery}&${lastNameQuery}&${pictureQuery}&${emailQuery}&${tokenQuery}`;
+
+            console.log('DIS YER URL', `${redirectURL}`);
+
+            res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
+            
+          })
+          .catch(console.log);
+
+        
       });
   }
 });
