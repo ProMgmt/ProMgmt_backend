@@ -38,10 +38,13 @@ userRouter.get('/api/signin', basicAuth, function(req, res, next) {
       if(!user) next(createError(404, 'username not found'));
       return user.comparePasswordHash(req.auth.password);
     })
-    .then( user => user.generateToken())
+    .then( user => {
+      res.body = user;
+      return user.generateToken();
+    })
     .then( token => {
       res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
-      res.send(token);
+      res.send({token: token, user: res.body});
     })
     .catch(next);
 });
