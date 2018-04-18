@@ -33,11 +33,14 @@ Project.findByIdAndAddTask = function(id, task, userId){
         if(!task.admins.includes(admin.toString())) task.admins.push(admin);
       });
       this.tempProject = project;
+      console.log('project@model', project);
+      console.log('task@model@prom1', task);
       return new Task(task).save();
     })
     .then( task => {
       this.tempProject.tasks.push(task._id);
       this.tempTask = task;
+      console.log('task@model@prom2', task);
       return this.tempProject.save();
     })
     .then(() => this.tempTask)

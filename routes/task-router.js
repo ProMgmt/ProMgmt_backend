@@ -12,14 +12,14 @@ const taskRouter = module.exports = Router();
 
 taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/project/:projectId/task');
-
-  req.body.admin.push(req.user._id);
   console.log('req.body', req.body);
 
   if (req.body.desc === undefined) return next(createError(400, 'bad request'));
 
+  console.log('req.body.desc', req.body.desc);
+
   Project.findByIdAndAddTask(req.params.projectId, req.body, req.user._id)
-    .then( task => res.json(task))
+    .then( task => {console.log('task@res', task); return res.json(task);})
     .catch(next);
 });
 

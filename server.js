@@ -5,8 +5,9 @@ const debug = require('debug')('promgmt:server');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv =  require('dotenv');
-const cors = require('cors');
+// const cors = require('cors');
 const superagent = require('superagent');
+const uuid = require('uuid/v4');
 
 const userRouter = require('./routes/user-router.js');
 const profileRouter = require('./routes/profile-router.js');
@@ -15,6 +16,9 @@ const orgRouter = require('./routes/org-router.js');
 const projectRouter = require('./routes/project-router.js');
 const taskRouter = require('./routes/task-router.js');
 const attachRouter = require('./routes/attach-router.js');
+const User = require('./model/user.js');
+const Profile = require('./model/profile.js');
+const ProfilePic = require('./model/profile-pic.js');
 
 const errors = require('./lib/err-middleware.js');
 
@@ -54,28 +58,93 @@ app.get('/oauth/google/code', function(req, res) {
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); //we have profile pic, name etc in the response.body. need to make a profile for them here. 
-        res.cookie('X-Some-Cookie', 'some token');
-        // interact with your db and add them if they dont exist alraeady
-        res.redirect(process.env.CLIENT_URL); //this is where we make frontend go back from google oauth to our frontend. now we can interact with out database and get token
+        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); 
+
+        let {
+          given_name: firstName, 
+          family_name: lastName, 
+          email, 
+          picture: avatarURI, 
+        } = response.body;
+
+        console.log('FIRST NAME', firstName);
+        
+        User.findOne({ email })
+          .then( user => {
+            if (user) {
+              const token = user.generateToken();
+              const profile = { firstName, lastName, userId: user._id };
+              return { token, profile };
+            } else {
+              return new User({ email, username: email, password: uuid() }).save()
+              
+                
+                .then( user => user.generateFindHash())
+                .then( user => {
+                  const userId = user._id;
+                  const profile = {
+                    firstName, 
+                    lastName, 
+                    userId,
+                    desc: 'tell us about yourself...', 
+                  };
+                  return new Profile(profile).save()
+                    .then(profile => {
+                      const profilePic = new ProfilePic({
+                        userId,
+                        profileId: profile._id, 
+                        avatarURI,
+                      });
+                      profile.profilePic = profilePic;
+                      return profile;
+                    }) 
+                    .then(profile => {
+                      const token = user.generateToken();
+                      return { token, profile };
+                    })
+                    .catch(console.log);
+                })
+                
+                .catch(console.log);
+
+            }
+          }) 
+          .then(data => {
+            // const tokenQuery = `token=${token}`;
+            const { token, profile } = data;
+            console.log('TOKEN!', token);
+            
+            // let redirectURL = `${process.env.CLIENT_URL}`;
+
+            console.log('PROFILE', profile);
+
+            res
+              .cookie('X-ProMgmt-Token', token, {maxAge: 900000})
+              .redirect('http://localhost:8080/dashboard');
+            // res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
+            
+          })
+          .catch(console.log);
+
+        
       });
   }
 });
 
-app.use(cors({
-  origin: process.env.CORS_ORIGINS.split(' '),
-  credentials: true,
-}));
-app.use(morgan('dev'));
-app.use(userRouter);
-app.use(profileRouter);
-app.use(profilePicRouter);
-app.use(orgRouter);
-app.use(projectRouter);
-app.use(taskRouter);
-app.use(attachRouter);
-
-app.use(errors);
+// app.use(cors({
+//   origin: process.env.CORS_ORIGINS.split(' '),
+//   credentials: true,
+// }));
+app
+  .use(morgan('dev'))
+  .use(userRouter)
+  .use(profileRouter)
+  .use(profilePicRouter)
+  .use(orgRouter)
+  .use(projectRouter)
+  .use(taskRouter)
+  .use(attachRouter)
+  .use(errors);
 
 const server = module.exports = app.listen(PORT, () => {
   debug(`Server listening on ${PORT}`);
