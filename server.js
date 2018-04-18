@@ -5,7 +5,7 @@ const debug = require('debug')('promgmt:server');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv =  require('dotenv');
-// const cors = require('cors');
+const cors = require('cors');
 const superagent = require('superagent');
 const uuid = require('uuid/v4');
 
@@ -131,10 +131,10 @@ app.get('/oauth/google/code', function(req, res) {
   }
 });
 
-// app.use(cors({
-//   origin: process.env.CORS_ORIGINS.split(' '),
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: process.env.CORS_ORIGINS.split(' '),
+  credentials: true,
+}));
 app
   .use(morgan('dev'))
   .use(userRouter)
