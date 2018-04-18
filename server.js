@@ -5,7 +5,7 @@ const debug = require('debug')('promgmt:server');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const dotenv =  require('dotenv');
-// const cors = require('cors');
+const cors = require('cors');
 const superagent = require('superagent');
 const uuid = require('uuid/v4');
 
@@ -72,9 +72,12 @@ app.get('/oauth/google/code', function(req, res) {
         User.findOne({ email })
           .then( user => {
             if (user) {
-              const token = user.generateToken();
-              const profile = { firstName, lastName, userId: user._id };
-              return { token, profile };
+              return user.generateToken()
+                .then(token => {
+                  const profile = { firstName, lastName, userId: user._id };
+
+                  return { token, profile };
+                });
             } else {
               return new User({ email, username: email, password: uuid() }).save()
               
@@ -99,8 +102,11 @@ app.get('/oauth/google/code', function(req, res) {
                       return profile;
                     }) 
                     .then(profile => {
-                      const token = user.generateToken();
-                      return { token, profile };
+                      return user.generateToken()
+                        .then(token => {
+
+                          return { token, profile };
+                        });
                     })
                     .catch(console.log);
                 })
@@ -120,7 +126,7 @@ app.get('/oauth/google/code', function(req, res) {
 
             res
               .cookie('X-ProMgmt-Token', token, {maxAge: 900000})
-              .redirect('http://localhost:8080/dashboard');
+              .redirect('http://localhost:8080/butts');
             // res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
             
           })
@@ -131,10 +137,11 @@ app.get('/oauth/google/code', function(req, res) {
   }
 });
 
-// app.use(cors({
-//   origin: process.env.CORS_ORIGINS.split(' '),
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: process.env.CORS_ORIGINS.split(' '),
+  credentials: true,
+}));
+
 app
   .use(morgan('dev'))
   .use(userRouter)
