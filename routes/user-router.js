@@ -49,10 +49,22 @@ userRouter.get('/api/signin', basicAuth, function(req, res, next) {
     .catch(next);
 });
 
+userRouter.put('/api/user/:userId/:profileId', bearerAuth, function(req, res, next) {
+  debug('PUT: /api/user/userId');
+
+  User.findByIdAndUpdate(req.params.userId, {profileId: req.params.profileId}, { new: true })
+    .then(user => {
+      console.log('YOU UPDATED YOUR USER!', user);
+      return res.json(user);
+    })
+    .catch(next);
+});
+
 userRouter.delete('/api/user/:userId', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/user/userId');
 
   User.findByIdAndRemove(req.params.userId)
+
     .then( () => res.sendStatus(204))
     .catch(next);
 });
