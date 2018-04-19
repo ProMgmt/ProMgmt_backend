@@ -35,14 +35,6 @@ app.get('/oauth/google/code', function(req, res) {
   if (!req.query.code) {
     res.redirect(process.env.CLIENT_URL);
   } else {
-    console.log('CODE:', req.query.code);
-    console.log('stuff', {
-      code: req.query.code,
-      grant_type: 'authorization_code',
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${process.env.API_URL}/oauth/google/code`,
-    });
     superagent.post('https://www.googleapis.com/oauth2/v4/token') 
       .type('form')
       .send({
@@ -53,12 +45,10 @@ app.get('/oauth/google/code', function(req, res) {
         redirect_uri: `${process.env.API_URL}/oauth/google/code`,
       })
       .then(response => {
-        console.log('Response AFTER code is given', response.body);
         return superagent.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect')
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-        console.log('::::OPEN ID - GOOGLE PLUS::::', response.body); 
 
         let {
           given_name: firstName, 
@@ -66,8 +56,6 @@ app.get('/oauth/google/code', function(req, res) {
           email, 
           picture: avatarURI, 
         } = response.body;
-
-        console.log('FIRST NAME', firstName);
         
         User.findOne({ email })
           .then( user => {
@@ -116,19 +104,15 @@ app.get('/oauth/google/code', function(req, res) {
             }
           }) 
           .then(data => {
-            // const tokenQuery = `token=${token}`;
-            const { token, profile } = data;
-            console.log('TOKEN!', token);
-            
-            // let redirectURL = `${process.env.CLIENT_URL}`;
-
-            console.log('PROFILE', profile);
-
+            const { token } = data;
+          
             res
               .cookie('X-ProMgmt-Token', token, {maxAge: 900000})
               .redirect('http://localhost:8080/butts');
+
             // res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
             
+
           })
           .catch(console.log);
 
@@ -141,6 +125,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGINS.split(' '),
   credentials: true,
 }));
+
 app
   .use(morgan('dev'))
   .use(userRouter)
