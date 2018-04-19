@@ -109,6 +109,10 @@ app.get('/oauth/google/code', function(req, res) {
             res
               .cookie('X-ProMgmt-Token', token, {maxAge: 900000})
               .redirect('http://localhost:8080/butts');
+
+            // res.redirect(`${redirectURL}`); //this is where we take our app back from google oauth to our frontend. now we can interact with our database and get token
+            
+
           })
           .catch(console.log);
 
