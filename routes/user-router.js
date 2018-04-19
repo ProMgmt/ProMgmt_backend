@@ -32,6 +32,8 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
 
 userRouter.get('/api/signin', basicAuth, function(req, res, next) {
   debug('GET: /api/signin');
+  let profileId;
+  let userId;
 
   User.findOne({ username: req.auth.username }) 
     .then( user => {
@@ -39,12 +41,14 @@ userRouter.get('/api/signin', basicAuth, function(req, res, next) {
       return user.comparePasswordHash(req.auth.password);
     })
     .then( user => {
-      res.body = user;
+      profileId = user.profileId;
+      userId = user._id;
       return user.generateToken();
     })
     .then( token => {
+      console.log(token);
       res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
-      res.send({token: token, user: res.body});
+      res.json({token, userId, profileId});
     })
     .catch(next);
 });
