@@ -19,8 +19,39 @@ taskRouter.post('/api/project/:projectId/task', bearerAuth, jsonParser, function
 
   console.log('req.body.desc', req.body.desc);
 
+  var tempTask = {};
+
   Project.findByIdAndAddTask(req.params.projectId, req.body, req.user._id)
-    .then( task => {console.log('task@res', task); return res.json(task);})
+    .then( task => {
+      console.log('task@res', task);
+      tempTask = task;
+      let admins = tempTask.admins.reduce((acc, admin) => {
+        acc.push({_id: admin.toString()});
+        return acc;
+      },[]);
+      console.log('admins1', admins);
+      return User.find({$or: admins});
+    })
+    .then( admins => {
+      tempTask.admins = admins;
+      console.log('tempTask.admins2', tempTask.admins);
+      if(tempTask.dependentTasks.length > 0){
+        let dependentTasks = tempTask.dependentTasks.reduce((acc, task) => {
+          acc.push({_id: task.toString()});
+          return acc;
+        },[]);
+        console.log('dependentTasks', dependentTasks);
+        Task.find({$or: dependentTasks})
+          .then(tasks =>{
+            tempTask.dependentTasks = tasks;
+            console.log('tempTask@final', tempTask);
+            return res.json(tempTask);
+          });
+      } else {
+        console.log('tempTask@final2', tempTask);
+        return res.json(tempTask);
+      }
+    })
     .catch(next);
 });
 

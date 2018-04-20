@@ -6,6 +6,8 @@ const jsonParser = require('body-parser').json();
 const Router = require('express').Router;
 const bearerAuth = require('../lib/bearer-auth.js');
 const Org = require('../model/org.js'); 
+const User = require('../model/user.js');
+const Project = require('../model/project.js');
 
 const orgRouter = module.exports = Router();
 
@@ -18,10 +20,32 @@ orgRouter.post('/api/org', bearerAuth, jsonParser, function(req, res, next) {
 
   req.body.admins.push(req.user._id);
   console.log('admins array', req.body.admins);
-  
+  var tempOrg = {};
   new Org(req.body).save()
-    .then(org => console.log(res.json(org)))
-    .then( org => res.json(org))
+    .then( org => {
+      tempOrg = org;
+      let admins = tempOrg.admins.reduce((acc, admin) => {
+        acc.push({_id: admin.toString()});
+        return acc;
+      },[]);
+      return User.find({$or: admins});
+    })
+    .then( admins => {
+      tempOrg.admins = admins;
+      if(tempOrg.users.length > 0){
+        let users = tempOrg.users.reduce((acc, user) => {
+          acc.push({_id: user.toString()});
+          return acc;
+        },[]);
+        return User.find({$or: users})
+          .then(users => {
+            tempOrg.users = users;
+            return res.json(tempOrg);
+          });
+      } else {
+        return res.json(tempOrg);
+      }
+    })
     .catch(next);
 });
 
@@ -58,9 +82,54 @@ orgRouter.put('/api/org/:orgId', bearerAuth, jsonParser, function(req, res, next
 
   if(!req.body.name || !req.body.desc) return next(createError(400, 'bad request'));
   
-
+  var tempOrg = {};
   Org.findByIdAndUpdate(req.params.orgId, req.body, { new: true })
-    .then( org => res.json(org))
+    .then( org => {
+      tempOrg = org;
+      let admins = tempOrg.admins.reduce((acc, admin) => {
+        acc.push({_id: admin.toString()});
+        return acc;
+      },[]);
+      return User.find({$or: admins});
+    })
+    .then( admins => {
+      tempOrg.admins = admins;
+      if(tempOrg.users.length > 0){
+        let users = tempOrg.users.reduce((acc, user) => {
+          acc.push({_id: user.toString()});
+          return acc;
+        },[]);
+        return User.find({$or: users})
+          .then(users => {
+            tempOrg.users = users;
+            if(tempOrg.projects.length > 0){
+              let projects = tempOrg.projects.reduce((acc, project) => {
+                acc.push({_id: project.toString()});
+                return acc;
+              },[]);
+              return Project.find({$or: projects})
+                .then(projects => {
+                  tempOrg.projects = projects;
+                  return res.json(tempOrg);
+                }).catch(next);
+            } else {
+              return res.json(tempOrg);
+            }
+          });
+      } else if(tempOrg.projects.length > 0) {
+        let projects = tempOrg.projects.reduce((acc, project) => {
+          acc.push({_id: project.toString()});
+          return acc;
+        },[]);
+        return Project.find({$or: projects})
+          .then(projects => {
+            tempOrg.projects = projects;
+            return res.json(tempOrg);
+          }).catch(next);
+      } else {
+        return res.json(tempOrg);
+      }
+    })
     .catch(next);
 });
 
