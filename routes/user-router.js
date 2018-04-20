@@ -32,15 +32,17 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
 
 userRouter.get('/api/me', bearerAuth, function(req, res, next) {
   debug('GET: /api/me');
+  console.log('REQ BODY', req.body);
 
-  User.findOne({_id: req.body._id})
+  User.findOne({_id: req.user._id})
     .then( user => {
       if (!user) next(createError(404, 'user not found'));
       delete user.findHash;
       delete user.password;
       delete user.username;
       delete user.email;
-      return user;
+      console.log('user object', user);
+      return res.json(user);
     })
     .catch(next);
 });
