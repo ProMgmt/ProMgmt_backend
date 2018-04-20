@@ -15,17 +15,20 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
 
   if(req.body.username === undefined || req.body.email === undefined || req.body.password === undefined) return next(createError(400, 'Bad Request'));
 
-
+  let userId;
   let password = req.body.password;
   delete req.body.password;
 
   let user = new User(req.body);
   user.generatePasswordHash(password)
     .then( user => user.save())
-    .then( user => user.generateToken())
+    .then( user => {
+      userId = user._id;
+      return user.generateToken();
+    })
     .then( token => {
       res.cookie('X-ProMgmt-Token', token, {maxAge: 900000});
-      res.send(token);
+      res.json({token, userId});
     })
     .catch(next);
 });
