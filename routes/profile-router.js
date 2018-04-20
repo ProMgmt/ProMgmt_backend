@@ -15,6 +15,8 @@ const profileRouter = module.exports = Router();
 profileRouter.post('/api/user/:userId/profile', bearerAuth, jsonParser, function (req, res, next) {
   debug('POST: /api/user/userId/profile');
   req.body.userId = req.params.userId;
+  console.log('params', req.params.userId);
+  console.log('profile body', req.body);
 
   User.findById(req.params.userId)
     .then(user => {
