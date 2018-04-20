@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGODB_URI);
 
 app
   .use(cors({
-    origin: process.env.CORS_ORIGINS.split(' '),
+    origin: process.env.CORS_ORIGINS,
     credentials: true,
   }))
   .use(morgan('dev'))
