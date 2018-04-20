@@ -27,7 +27,7 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
       return user.generateToken();
     })
     .then( token => {
-      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000, domain: 'pro-mgmt-fe-staging.herokuapp.com'});
+      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000, domain: '.herokuapp.com'});
       res.json({token, userId});
     })
     .catch(next);
@@ -69,7 +69,7 @@ userRouter.get('/api/signin', basicAuth, function(req, res, next) {
     })
     .then( token => {
       console.log(token);
-      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000, domain: 'pro-mgmt-fe-staging.herokuapp.com'});
+      res.cookie('X-ProMgmt-Token', token, {maxAge: 900000, domain: '.herokuapp.com'});
       res.json({token, userId, profileId});
     })
     .catch(next);
