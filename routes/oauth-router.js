@@ -19,6 +19,7 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
   if (!req.query.code) {
     res.redirect(process.env.CLIENT_URL);
   } else {
+    // console.log('HIT IT', req.query);
     superagent.post('https://www.googleapis.com/oauth2/v4/token') 
       .type('form')
       .send({
@@ -29,31 +30,32 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
         redirect_uri: `${process.env.API_URL}/oauth/google/code`,
       })
       .then(response => {
+        console.log('response', response);
+
         return superagent.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect')
           .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
-
+      
         let {
           given_name: firstName, 
           family_name: lastName, 
           email, 
           picture: avatarURI, 
         } = response.body;
-        console.log('RES', response);
+      
         User.findOne({ email })
           .then( user => {
-            console.log('__________USER___________', user);
             if (user) {
               return user.generateToken()
                 .then(token => {
                   const profile = { firstName, lastName, userId: user._id };
-
+            
                   return { token, profile };
                 });
             } else {
+              console.log('__________USER___________', user);
               return new User({ email, username: email, password: uuid() }).save()
-                
                 .then( user => user.generateFindHash())
                 .then( user => {
                   const userId = user._id;
@@ -98,7 +100,7 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
             
 
           })
-          .catch(console.log);
+          .catch(console.log('skipped all the shit '));
 
         
       });

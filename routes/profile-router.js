@@ -34,7 +34,7 @@ profileRouter.get('/api/profile/:firstName/:lastName', bearerAuth, function (req
 
   // TODO: add functionality so that it is not case sensitive
 
-  Profile.find({ firstName: req.params.firstName, lastName: req.params.lastName })
+  Profile.findOne({ firstName: req.params.firstName, lastName: req.params.lastName })
     .then(profile => {
       if(!profile) return next(createError(404, 'user not found'));
       return res.send(profile);
