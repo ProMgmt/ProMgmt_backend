@@ -7,6 +7,7 @@ const Router = require('express').Router;
 const bearerAuth = require('../lib/bearer-auth.js');
 const Project = require('../model/project.js');
 const Task = require('../model/task.js');
+const User = require('../model/user.js');
 
 const taskRouter = module.exports = Router();
 
@@ -36,11 +37,40 @@ taskRouter.get('/api/task/:taskId', bearerAuth, function(req, res, next) {
 
 taskRouter.put('/api/task/:taskId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/task/taskId');
+  
+  var tempTask = {};
 
   Task.findByIdAndUpdate(req.params.taskId, req.body, { new: true})
     .then( task => {
       if (!task) return next(createError(404));
-      return res.json(task);
+      tempTask = task;
+      console.log('tempTask1', tempTask);
+      let admins = tempTask.admins.reduce((acc, admin) => {
+        acc.push({_id: admin.toString()});
+        return acc;
+      },[]);
+      console.log('admins1', admins);
+      return User.find({$or: admins});
+    })
+    .then( admins => {
+      tempTask.admins = admins;
+      console.log('tempTask.admins2', tempTask.admins);
+      if(tempTask.dependentTasks.length > 0){
+        let dependentTasks = tempTask.dependentTasks.reduce((acc, task) => {
+          acc.push({_id: task.toString()});
+          return acc;
+        },[]);
+        console.log('dependentTasks', dependentTasks);
+        Task.find({$or: dependentTasks})
+          .then(tasks =>{
+            tempTask.dependentTasks = tasks;
+            console.log('tempTask@final', tempTask);
+            return res.json(tempTask);
+          });
+      } else {
+        console.log('tempTask@final2', tempTask);
+        return res.json(tempTask);
+      }
     })
     .catch(next);
 });
