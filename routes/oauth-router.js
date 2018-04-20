@@ -40,9 +40,10 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
           email, 
           picture: avatarURI, 
         } = response.body;
-        
+        console.log('RES', response);
         User.findOne({ email })
           .then( user => {
+            console.log('__________USER___________', user);
             if (user) {
               return user.generateToken()
                 .then(token => {
@@ -52,7 +53,6 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
                 });
             } else {
               return new User({ email, username: email, password: uuid() }).save()
-              
                 
                 .then( user => user.generateFindHash())
                 .then( user => {
@@ -89,7 +89,7 @@ oauthRouter.get('/oauth/google/code', function(req, res) {
           }) 
           .then(data => {
             const { token } = data;
-          
+            console.log('someshit', data);
             res
               .cookie('X-ProMgmt-Token', token, {maxAge: 900000})
               .redirect('http://localhost:8080/dashboard');

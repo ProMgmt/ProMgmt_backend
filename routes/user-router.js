@@ -30,6 +30,21 @@ userRouter.post('/api/signup', jsonParser, function(req, res, next) {
     .catch(next);
 });
 
+userRouter.get('/api/me', bearerAuth, function(req, res, next) {
+  debug('GET: /api/me');
+
+  User.findOne({_id: req.body._id})
+    .then( user => {
+      if (!user) next(createError(404, 'user not found'));
+      delete user.findHash;
+      delete user.password;
+      delete user.username;
+      delete user.email;
+      return user;
+    })
+    .catch(next);
+});
+
 userRouter.get('/api/signin', basicAuth, function(req, res, next) {
   debug('GET: /api/signin');
   let profileId;
@@ -58,7 +73,6 @@ userRouter.put('/api/user/:userId/:profileId', bearerAuth, function(req, res, ne
 
   User.findByIdAndUpdate(req.params.userId, {profileId: req.params.profileId}, { new: true })
     .then(user => {
-      console.log('YOU UPDATED YOUR USER!', user);
       return res.json(user);
     })
     .catch(next);
